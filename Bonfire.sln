@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.API", "Bonfire.API\Bonfire.API.csproj", "{A70806B5-B040-4DFF-9E34-2D9D5631E87F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Core", "Bonfire.Core\Bonfire.Core.csproj", "{18D6CB38-EB33-4731-A7B7-1244F87CE205}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Application", "Bonfire.Application\Bonfire.Application.csproj", "{51193834-9ECB-4A12-AF91-2E35803994EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A70806B5-B040-4DFF-9E34-2D9D5631E87F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A70806B5-B040-4DFF-9E34-2D9D5631E87F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A70806B5-B040-4DFF-9E34-2D9D5631E87F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A70806B5-B040-4DFF-9E34-2D9D5631E87F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D6CB38-EB33-4731-A7B7-1244F87CE205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D6CB38-EB33-4731-A7B7-1244F87CE205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D6CB38-EB33-4731-A7B7-1244F87CE205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D6CB38-EB33-4731-A7B7-1244F87CE205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51193834-9ECB-4A12-AF91-2E35803994EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51193834-9ECB-4A12-AF91-2E35803994EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51193834-9ECB-4A12-AF91-2E35803994EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51193834-9ECB-4A12-AF91-2E35803994EF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
