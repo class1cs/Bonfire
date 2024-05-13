@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Core", "Bonfire.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Application", "Bonfire.Application\Bonfire.Application.csproj", "{51193834-9ECB-4A12-AF91-2E35803994EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Persistance", "Bonfire.Persistance\Bonfire.Persistance.csproj", "{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{51193834-9ECB-4A12-AF91-2E35803994EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51193834-9ECB-4A12-AF91-2E35803994EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51193834-9ECB-4A12-AF91-2E35803994EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
