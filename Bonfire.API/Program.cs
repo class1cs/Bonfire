@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseMySQL(connString);
+    options.UseMySQL("server=localhost;user=root;database=bonfire;password=admin");
 });
 var app = builder.Build();
 
