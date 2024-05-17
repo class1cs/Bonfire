@@ -7,6 +7,7 @@ var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(AppMapProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseMySQL("server=localhost;user=root;database=bonfire;password=admin");

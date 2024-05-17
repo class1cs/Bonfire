@@ -1,4 +1,5 @@
-﻿using Bonfire.Core.Dtos.Requests;
+﻿using AutoMapper;
+using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Dtos.Response;
 using Bonfire.Core.Entities;
 using Bonfire.Persistance;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
 
-public class MessagesService(AppDbContext dbContext)
+public class MessagesService(AppDbContext dbContext, IMapper mapper)
 {
     public async Task<MessageResponseDto> SendMessage(SendMessageDto sendMessageDto, Guid chatId, User author)
     {
@@ -15,7 +16,8 @@ public class MessagesService(AppDbContext dbContext)
         var userDto = new UserResponseDto(author.Id, author.NickName);
         recieverChat.ChatHistory.Add(message);
         await dbContext.SaveChangesAsync();
-        return new MessageResponseDto(Guid.NewGuid(), sendMessageDto.Text, userDto);
+        var dto = mapper.Map<MessageResponseDto>(message);
+        return dto;
 
 
     }
