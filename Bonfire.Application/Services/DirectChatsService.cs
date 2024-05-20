@@ -16,7 +16,7 @@ public class DirectChatsService(AppDbContext appDbContext, IMapper mapper)
             x.Participants.Contains(reciever) && x.Participants.Contains(currentUser));
         if (chatExists)
         {
-            throw new DirectChatNotFoundException();
+            throw new DirectChatAlreadyExistsException();
         }
         var users = new List<User>{ reciever, currentUser };
         var directChat = new DirectChat(Guid.NewGuid(), new List<Message>(), users);
