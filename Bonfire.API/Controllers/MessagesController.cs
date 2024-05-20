@@ -12,13 +12,13 @@ namespace Bonfire.API.Controllers
     public class MessagesController(MessagesService messagesService, AppDbContext dbContext) : ControllerBase
     {
 
-        [HttpPost("{chatId}")]
-        public async Task<IActionResult> SendMessage(Guid chatId, [FromBody] SendMessageDto sendMessageDto)
+        [HttpPost("{directChatId}")]
+        public async Task<IActionResult> SendMessage(Guid directChatId, [FromBody] SendMessageDto sendMessageDto)
         {
             var currentUserId = ControllerContext.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
             var currentUserGuidId = Guid.Parse(currentUserId);
             var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuidId);
-            var responseDto = await messagesService.SendMessage(sendMessageDto, chatId, currentUser);
+            var responseDto = await messagesService.SendMessage(sendMessageDto, directChatId, currentUser);
             return Ok(responseDto);
         }
     }

@@ -9,9 +9,9 @@ namespace Bonfire.Application.Services;
 
 public class MessagesService(AppDbContext dbContext, IMapper mapper)
 {
-    public async Task<MessageResponseDto> SendMessage(SendMessageDto sendMessageDto, Guid chatId, User author)
+    public async Task<MessageResponseDto> SendMessage(SendMessageDto sendMessageDto, Guid directChatId, User author)
     {
-        var recieverChat = await dbContext.DirectChats.AsNoTracking().FirstOrDefaultAsync(x => x.Id == chatId);
+        var recieverChat = await dbContext.DirectChats.AsNoTracking().FirstOrDefaultAsync(x => x.Id == directChatId);
         var message = new Message(Guid.NewGuid(), sendMessageDto.Text, author, DateTime.Now);
         var userDto = new UserResponseDto(author.Id, author.NickName);
         recieverChat.ChatHistory.Add(message);

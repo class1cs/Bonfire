@@ -25,4 +25,17 @@ public class DirectChatsService(AppDbContext appDbContext, IMapper mapper)
         var dto = mapper.Map<DirectChatResponseDto>(directChat);
         return dto;
     }
+    
+    public async Task<DirectChatResponseDto> RemoveDirectChat(Guid directChatId)
+    {
+        var directChat = await appDbContext.DirectChats.AsNoTracking().FirstOrDefaultAsync(x => x.Id == directChatId);
+        if (directChat is null)
+        {
+            throw new DirectChatNotFoundException();
+        }
+        appDbContext.DirectChats.Remove(directChat);
+        await appDbContext.SaveChangesAsync();
+        var dto = mapper.Map<DirectChatResponseDto>(directChat);
+        return dto;
+    }
 }
