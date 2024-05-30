@@ -3,16 +3,20 @@ using Bonfire.Core.Dtos.Response;
 using Bonfire.Core.Entities;
 using Bonfire.Core.Exceptions;
 using Bonfire.Persistance;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
 
-public class DirectChatsService(AppDbContext appDbContext, IMapper mapper)
+public class DirectChatsService(AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
 {
-    public async Task<DirectChatResponseDto> CreateDirectChat(Guid recieverId, User currentUser)
+    public async Task<DirectChatResponseDto> CreateDirectChat(Guid recieverId)
     {
-        var reciever = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == recieverId);
-        var chatExists = await appDbContext.DirectChats.AsNoTracking().AnyAsync(x =>
+        var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+        var currentUserGuid = Guid.Parse(currentUserString);
+        var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
+        var reciever = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == recieverId);
+        var chatExists = await dbContext.DirectChats.AsNoTracking().AnyAsync(x =>
             x.Participants.Contains(reciever) && x.Participants.Contains(currentUser));
         if (chatExists)
         {
@@ -20,21 +24,29 @@ public class DirectChatsService(AppDbContext appDbContext, IMapper mapper)
         }
         var users = new List<User>{ reciever, currentUser };
         var directChat = new DirectChat(Guid.NewGuid(), new List<Message>(), users);
-        await appDbContext.DirectChats.AddAsync(directChat);
-        await appDbContext.SaveChangesAsync();
+        await dbContext.DirectChats.AddAsync(directChat);
+        await dbContext.SaveChangesAsync();
         var dto = mapper.Map<DirectChatResponseDto>(directChat);
         return dto;
     }
     
     public async Task<DirectChatResponseDto> RemoveDirectChat(Guid directChatId)
     {
-        var directChat = await appDbContext.DirectChats.AsNoTracking().FirstOrDefaultAsync(x => x.Id == directChatId);
+        var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+        var currentUserGuid = Guid.Parse(currentUserString);
+        var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
+        var directChat = await dbContext.DirectChats.Include(x => x.Participants).AsNoTracking().FirstOrDefaultAsync(x => x.Id == directChatId);
         if (directChat is null)
         {
             throw new DirectChatNotFoundException();
         }
-        appDbContext.DirectChats.Remove(directChat);
-        await appDbContext.SaveChangesAsync();
+
+        if (!directChat.Participants.Contains(currentUser))
+        {
+            throw new AccessToDirectChatDeniedException();
+        }
+        dbContext.DirectChats.Remove(directChat);
+        await dbContext.SaveChangesAsync();
         var dto = mapper.Map<DirectChatResponseDto>(directChat);
         return dto;
     }

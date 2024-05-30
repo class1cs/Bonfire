@@ -1,3 +1,4 @@
+using Bonfire.API.Middlewares;
 using Bonfire.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,8 @@ var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddExceptionHandler<ExceptionMiddleWare>();
 builder.Services.AddAutoMapper(typeof(AppMapProfile));
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

@@ -13,10 +13,8 @@ namespace Bonfire.API.Controllers
         [HttpPost("{recieverId}")]
         public async Task<IActionResult> CreateDirectChat(Guid recieverId)
         {
-            var currentUserId = ControllerContext.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var currentUserGuidId = Guid.Parse(currentUserId);
-            var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuidId);
-            var responseDto = await directChatsService.CreateDirectChat(recieverId, currentUser);
+           
+            var responseDto = await directChatsService.CreateDirectChat(recieverId);
             return Ok(responseDto);
         }
         

@@ -2,12 +2,12 @@
 
 namespace Bonfire.Core.Exceptions;
 
-public class AccessToMessageDeniedException : BaseException
+public class AccessToDirectChatDeniedException : BaseException
 {
     /// <summary>
     ///     Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
-    public AccessToMessageDeniedException() : base(HttpStatusCode.Forbidden, HttpErrors.AccessToMessageDenied)
+    public AccessToDirectChatDeniedException() : base(HttpStatusCode.Forbidden, HttpErrors.AccessToDirectChatDenied)
     {
     }
 }
