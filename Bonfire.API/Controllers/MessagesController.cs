@@ -10,15 +10,12 @@ namespace Bonfire.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    internal class MessagesController(MessagesService messagesService, AppDbContext dbContext) : ControllerBase
+    public class MessagesController(MessagesService messagesService, AppDbContext dbContext) : ControllerBase
     {
 
         [HttpPost("{directChatId}")]
         public async Task<IActionResult> SendMessage(Guid directChatId, [FromBody] MessageRequestDto messageSendRequestDto)
         {
-            var currentUserId = ControllerContext.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var currentUserGuidId = Guid.Parse(currentUserId);
-            var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuidId);
             var responseDto = await messagesService.SendMessage(messageSendRequestDto, directChatId);
             return Ok(responseDto);
         }
@@ -27,9 +24,6 @@ namespace Bonfire.API.Controllers
         [HttpPut("{messageId}")]
         public async Task<IActionResult> EditMessage(Guid messageId, [FromBody] MessageRequestDto messageRequestDto)
         {
-            var currentUserId = ControllerContext.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-            var currentUserGuidId = Guid.Parse(currentUserId);
-            var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuidId);
             var responseDto = await messagesService.EditMessage(messageRequestDto, messageId);
             return Ok(responseDto);
         }

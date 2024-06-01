@@ -1,6 +1,6 @@
 ﻿namespace Bonfire.Core.Dtos.Requests;
 
-public class MessageRequestDto(string text)
+public class MessageRequestDto
 {
-    public string Text { get; private set; } = text;
+    public string Text { get; set; }
 }

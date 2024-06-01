@@ -7,8 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Bonfire.Abstractions\Bonfire.Abstractions.csproj" />
       <ProjectReference Include="..\Bonfire.Persistance\Bonfire.Persistance.csproj" />
       <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
     </ItemGroup>
 
 </Project>

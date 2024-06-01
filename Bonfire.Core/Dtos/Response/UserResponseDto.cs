@@ -1,8 +1,8 @@
 ﻿namespace Bonfire.Core.Dtos.Response;
 
-public class UserResponseDto(Guid id, string nickName)
+public class UserResponseDto
 {
-    public Guid Id { get; private set; } = id;
+    public Guid Id { get; private set; }
 
-    public string NickName { get; private set; } = nickName;
+    public string NickName { get; private set; }
 }

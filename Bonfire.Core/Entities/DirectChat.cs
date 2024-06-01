@@ -1,10 +1,21 @@
 ﻿namespace Bonfire.Core.Entities;
 
-public class DirectChat(Guid id, List<Message> chatHistory, List<User> participants)
+public class DirectChat
 {
-    public Guid Id { get; set; } = id;
+    public DirectChat(List<Message> chatHistory, List<User> participants)
+    {
+        ChatHistory = chatHistory;
+        Participants = participants;
+    }
 
-    public List<Message> ChatHistory { get; set; } = chatHistory;
+    public DirectChat()
+    {
+        
+    }
     
-    public List<User> Participants { get; set; } = participants;
+    public Guid Id { get; set; }
+
+    public List<Message> ChatHistory { get; set; }
+    
+    public List<User> Participants { get; set; }
 }

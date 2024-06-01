@@ -1,10 +1,9 @@
 ﻿namespace Bonfire.Core.Dtos.Response;
 
-public class MessageResponseDto(Guid id, string text, UserResponseDto author)
+public class MessageResponseDto
 {
-    public Guid Id { get; private set; } = id;
+    public Guid Id { get; private set; }
     
-    public string Text { get; private set; } = text;
-
-    public UserResponseDto Author { get; private set; } = author;
+    public string Text { get; private set; } 
+    
 }

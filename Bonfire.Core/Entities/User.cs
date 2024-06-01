@@ -1,12 +1,24 @@
 ﻿namespace Bonfire.Core.Entities;
 
-public class User(Guid id, string nickName,  string passwordHash, List<DirectChat> directChats)
+public class User
 {
-    public Guid Id { get; set; } = id;
+    public User(string nickName, string passwordHash, List<DirectChat> directChats)
+    {
+        NickName = nickName;
+        PasswordHash = passwordHash;
+        DirectChats = directChats;
+    }
 
-    public string NickName { get; set; } = nickName;
+    public User()
+    {
+        
+    }
 
-    public string PasswordHash { get; set; } = passwordHash;
+    public Guid Id { get; set; }
 
-    public List<DirectChat> DirectChats { get; set; } = directChats;
+    public string NickName { get; set; }
+
+    public string PasswordHash { get; set; }
+
+    public List<DirectChat> DirectChats { get; set; }
 }

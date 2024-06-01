@@ -1,12 +1,24 @@
 ﻿namespace Bonfire.Core.Entities;
 
-public class Message(Guid id, string text, User user, DateTime sentTime)
+public class Message
 {
-    public Guid Id { get; set; } = id;
+    public Message(string text, DateTime sentTime, User author)
+    {
+        Text = text;
+        SentTime = sentTime;
+        Author = author;
+    }
 
-    public string Text { get; set; } = text;
+    public Message()
+    {
+        
+    }
 
-    public DateTime SentTime { get; set; } = sentTime;
+    public Guid Id { get; set; }
+
+    public string Text { get; set; }
+
+    public DateTime SentTime { get; set; }
     
-    public User Author { get; set; } = user;
+    public User Author { get; set; }
 }

@@ -8,7 +8,7 @@ namespace Bonfire.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    internal class DirectChatsController(AppDbContext dbContext, DirectChatsService directChatsService) : ControllerBase
+    public class DirectChatsController(AppDbContext dbContext, DirectChatsService directChatsService) : ControllerBase
     {  
         [HttpPost("{recieverId}")]
         public async Task<IActionResult> CreateDirectChat(Guid recieverId)

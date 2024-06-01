@@ -2,11 +2,11 @@
 
 namespace Bonfire.Core.Dtos.Response;
 
-public class DirectChatResponseDto(Guid id, List<UserResponseDto> participants, List<MessageResponseDto> chatHistory)
+public class DirectChatResponseDto
 {
-    public Guid Id { get; private set; } = id;
+    public Guid Id { get; private set; }
 
-    public List<MessageResponseDto> ChatHistory { get; private set; } = chatHistory;
+    public List<MessageResponseDto> ChatHistory { get; private set; }
     
-    public List<UserResponseDto> Participants { get; private set; } = participants;
+    public List<UserResponseDto> Participants { get; private set; }
 }
