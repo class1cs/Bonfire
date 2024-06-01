@@ -30,32 +30,45 @@ public class MessagesService(AppDbContext dbContext, IMapper mapper, IHttpContex
         return dto;
     }
     
-    public async Task<MessageResponseDto> EditMessage(MessageRequestDto messageSendRequestDto, Guid messageId)
+    public async Task<MessageResponseDto> EditMessage(MessageRequestDto messageSendRequestDto, Guid messageId, Guid directGroupId)
     {
         var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         var currentUserGuid = Guid.Parse(currentUserString);
         var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
+
+        var directGroup = await dbContext.DirectChats.Include(x => x.Participants).AsNoTracking().FirstOrDefaultAsync(x => x.Id == directGroupId);
         var message = await dbContext.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
+       
         if (message == null)
         {
             throw new MessageNotFoundException();
         }
+        
+       
+        
         if (message?.Author != currentUser) 
         {
             throw new AccessToMessageDeniedException();
         }
+        
         message.Text = messageSendRequestDto.Text;
         await dbContext.SaveChangesAsync();
         var dto = mapper.Map<MessageResponseDto>(message);
         return dto;
     }
     
-    public async Task<MessageResponseDto> RemoveMessage(Guid messageId)
+    public async Task<MessageResponseDto> RemoveMessage(Guid messageId, Guid directGroupId)
     {
         var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
         var currentUserGuid = Guid.Parse(currentUserString);
         var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
         var message = await dbContext.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
+        var directGroup = await dbContext.DirectChats.Include(x => x.Participants).AsNoTracking().FirstOrDefaultAsync(x => x.Id == directGroupId);
+        
+        if (directGroup.ChatHistory.Contains(message) is false)
+        {
+            throw new MessageNotFoundException();
+        }
         
         if (message == null)
         {
@@ -66,8 +79,6 @@ public class MessagesService(AppDbContext dbContext, IMapper mapper, IHttpContex
         {
             throw new AccessToMessageDeniedException();
         }
-        
-        
 
         dbContext.Messages.Remove(message);
         await dbContext.SaveChangesAsync();
