@@ -50,9 +50,10 @@ public class ConversationsServiceTests
         var result = await conversationsService.CreateConversation(new ConversationRequest {UsersIds = participants});
         
         // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
+        result.Participants.Count.Should().Be(2);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
-        
-
     }
     
     [Fact(DisplayName = "При создании переписки она должна иметь тип 'Беседа', если в ней 3 и более пользователя")]
@@ -80,8 +81,10 @@ public class ConversationsServiceTests
         var result = await conversationsService.CreateConversation(new ConversationRequest {UsersIds = participants});
         
         // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Conversation);
-        
+        result.Participants.Count.Should().Be(4);
 
     }
     
@@ -114,7 +117,7 @@ public class ConversationsServiceTests
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
-
+        result.Participants.Should().NotBeNullOrEmpty();
     }
     
     [Fact(DisplayName = "При попытке создания диалога с самим собой, должна выдаваться ошибка")]

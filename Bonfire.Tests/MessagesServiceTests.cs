@@ -51,7 +51,8 @@ public class MessagesServiceTests
         
         // Assert
         result.Should().NotBeNull();
-        
+        result.Text.Should().Be("test");
+        result.Id.Should().Be(1);
     }
     
     [Fact(DisplayName = "При попытке отправки пустого сообщения в переписку должна выдаваться ошибка.")]
@@ -141,6 +142,35 @@ public class MessagesServiceTests
         
         // Assert
         await result.Should().ThrowAsync<MessageNotFoundException>();
+    }
+    
+    [Fact(DisplayName = "При получении сообщений должно возвращаться их DTO.")]
+    public async void Messages_Should_Be_Given()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        var context = new AppDbContext(options);
+        var user = CreateUser();
+        var user1 = CreateUser("test1", 2);
+        var currentUserService = A.Fake<ICurrentUserService>();
+        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        
+        var messagesService = new MessagesService(context, currentUserService);
+        
+        var messages = new List<Message>{new Message("text", DateTime.Now, user)};
+        var participants = new List<User> { user, user1 };
+        var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
+        
+        await context.AddAsync(user);
+        await context.AddAsync(user1);
+        await context.AddAsync(conversation);
+        await context.SaveChangesAsync();
+        
+        // Act
+        var result = await messagesService.GetMessages(conversation.Id);
+        
+        // Assert
+        result.Messages.Count.Should().Be(1);
     }
     
     [Fact(DisplayName = "При попытке редактирования своего сообщения не в той переписке должна выдаваться ошибка.")]
@@ -265,6 +295,7 @@ public class MessagesServiceTests
         {
             await messagesService.RemoveMessage(1, secondConversation.Id);
         };
+        
         // Assert
         await result.Should().ThrowAsync<MessageNotFoundException>();
     }
@@ -396,8 +427,9 @@ public class MessagesServiceTests
         var result = await messagesService.EditMessage(new MessageRequest{ Text = "tests" },1, conversation.Id);
         
         // Assert
-        result.Should().BeOfType<MessageResponse>();
+        result.Should().NotBeNull();
         result.Text.Should().Be("tests");
+        result.Id.Should().Be(1);
     }
     
     [Fact(DisplayName = "При попытке редактирования текста сообщения на пустоту должна выдаваться ошибка.")]
@@ -456,6 +488,8 @@ public class MessagesServiceTests
         var result = await messagesService.RemoveMessage(conversation.Id, 1);
         
         // Assert
-        result.Should().BeOfType<MessageResponse>().And.NotBeNull();
+        result.Should().NotBeNull();
+        result.Text.Should().Be("test");
+        result.Id.Should().Be(1);
     }
 }
