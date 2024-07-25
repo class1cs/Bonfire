@@ -2,12 +2,12 @@
 
 namespace Bonfire.Core.Exceptions;
 
-public class DirectChatAlreadyExistsException : BaseException
+public class AccessToConversationDeniedException : BaseException
 {
     /// <summary>
     ///     Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
-    public DirectChatAlreadyExistsException() : base(HttpStatusCode.Conflict, HttpErrors.DirectChatAlreadyExists)
+    public AccessToConversationDeniedException() : base(HttpStatusCode.Forbidden, HttpErrors.AccessToConversationDenied)
     {
     }
 }

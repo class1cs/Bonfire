@@ -2,23 +2,23 @@
 
 public class User
 {
-    public User(string nickName, string passwordHash, List<DirectChat> directChats)
+    public User(string nickname, string passwordHash, ICollection<Conversation> conversations)
     {
-        NickName = nickName;
+        Nickname = nickname;
         PasswordHash = passwordHash;
-        DirectChats = directChats;
+        Conversations = conversations;
     }
-
+    
     public User()
     {
         
     }
-
-    public Guid Id { get; set; }
-
-    public string NickName { get; set; }
-
+    
+    public long Id { get; set; }
+    
+    public string Nickname { get; set; }
+    
     public string PasswordHash { get; set; }
 
-    public List<DirectChat> DirectChats { get; set; }
+    public ICollection<Conversation> Conversations { get; set; }
 }

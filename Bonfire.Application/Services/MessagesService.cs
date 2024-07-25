@@ -1,88 +1,134 @@
-﻿using System.Security.Cryptography.Xml;
-using AutoMapper;
+﻿using Bonfire.Abstractions;
 using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Dtos.Response;
 using Bonfire.Core.Entities;
 using Bonfire.Core.Exceptions;
 using Bonfire.Persistance;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Bonfire.Application.Services;
 
-public class MessagesService(AppDbContext dbContext, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<MessagesService> logger)
+public class MessagesService(AppDbContext dbContext, ICurrentUserService currentUserService) : IMessagesService
 {
-    public async Task<MessageResponseDto> SendMessage(MessageRequestDto messageSendRequestDto, Guid directChatId)
+    
+    public async Task<MessageResponse> SendMessage(MessageRequest messageRequest, long conversationId)
     {
-        var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var currentUserGuid = Guid.Parse(currentUserString);
-        var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
-        var chat = await dbContext.DirectChats.Include(x => x.ChatHistory).FirstOrDefaultAsync(x => x.Id == directChatId);
-        if (chat == null)
+        var currentUser  = await currentUserService.GetCurrentUser();
+        var conversation = await dbContext.Conversations.Include(x => x.Messages)
+            .Include(conversation => conversation.Participants).FirstOrDefaultAsync(x => x.Id == conversationId);
+        
+        if (conversation == null)
         {
-            throw new DirectChatNotFoundException();
+            throw new ConversationNotFoundException();
         }
-        var message = new Message(messageSendRequestDto.Text, DateTime.Now, currentUser);
-        chat.ChatHistory.Add(message);
+
+        if (conversation.Participants.All(x => x.Id != currentUser.Id))
+        {
+            throw new AccessToConversationDeniedException();
+        }
+        
+        if (string.IsNullOrWhiteSpace(messageRequest.Text))
+        {
+            throw new EmptyMessageTextException();
+        }
+        
+        var message = new Message(messageRequest.Text, DateTime.Now, currentUser);
+        
+        conversation.Messages.Add(message);
         await dbContext.SaveChangesAsync();
-        var dto = mapper.Map<MessageResponseDto>(message);
-        return dto;
+        
+        
+        return new MessageResponse
+        {
+            Id = message.Id,
+            Text = message.Text
+        };
     }
     
-    public async Task<MessageResponseDto> EditMessage(MessageRequestDto messageSendRequestDto, Guid messageId, Guid directGroupId)
+    public async Task<MessageResponse> EditMessage(MessageRequest messageRequest, long messageId, long conversationId)
     {
-        var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var currentUserGuid = Guid.Parse(currentUserString);
-        var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
+        var currentUser = await currentUserService.GetCurrentUser();
+        
+        var conversation = await dbContext.Conversations.FirstOrDefaultAsync(x => x.Id == conversationId);
+        var message = await dbContext.Messages.Include(message => message.Author).FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
 
-        var directGroup = await dbContext.DirectChats.Include(x => x.Participants).AsNoTracking().FirstOrDefaultAsync(x => x.Id == directGroupId);
-        var message = await dbContext.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
-       
-        if (message == null)
+        if (conversation is null)
+        {
+            throw new ConversationNotFoundException();
+        }
+        
+        if (message is null)
         {
             throw new MessageNotFoundException();
         }
         
-       
-        
-        if (message?.Author != currentUser) 
+        if (message?.Author?.Id != currentUser?.Id) 
         {
             throw new AccessToMessageDeniedException();
         }
         
-        message.Text = messageSendRequestDto.Text;
+        if (string.IsNullOrWhiteSpace(messageRequest.Text))
+        {
+            throw new EmptyMessageTextException();
+        }
+        
+        message.Text = messageRequest.Text;
         await dbContext.SaveChangesAsync();
-        var dto = mapper.Map<MessageResponseDto>(message);
-        return dto;
+        
+        return new MessageResponse
+        {
+            Id = message.Id,
+            Text = message.Text
+        };
     }
     
-    public async Task<MessageResponseDto> RemoveMessage(Guid messageId, Guid directGroupId)
+    public async Task<MessageResponse> RemoveMessage(long messageId, long conversationId)
     {
-        var currentUserString = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-        var currentUserGuid = Guid.Parse(currentUserString);
-        var currentUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserGuid);
-        var message = await dbContext.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
-        var directGroup = await dbContext.DirectChats.Include(x => x.Participants).AsNoTracking().FirstOrDefaultAsync(x => x.Id == directGroupId);
+        var currentUser = await currentUserService.GetCurrentUser();
         
-        if (directGroup.ChatHistory.Contains(message) is false)
-        {
-            throw new MessageNotFoundException();
-        }
+        var message = await dbContext.Messages.Include(message => message.Author).FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
         
         if (message == null)
         {
             throw new MessageNotFoundException();
         }
         
-        if (message?.Author != currentUser) 
+        if (message?.Author?.Id != currentUser?.Id) 
         {
             throw new AccessToMessageDeniedException();
         }
 
         dbContext.Messages.Remove(message);
         await dbContext.SaveChangesAsync();
-        var dto = mapper.Map<MessageResponseDto>(message);
-        return dto;
+        
+        return new MessageResponse
+        {
+            Id = message.Id,
+            Text = message.Text
+        };
+    }
+    
+    public async Task<MessagesResponse> GetMessages(long conversationId, long offsetMessageId = 0, short limit = 50)
+    {
+        var currentUser  = await currentUserService.GetCurrentUser();
+        
+        var conversation = await dbContext.Conversations.Include(x => x.Messages.Where(b => b.Id > offsetMessageId).Take(limit)).Include(x => x.Participants).FirstOrDefaultAsync(x => x.Id == conversationId);
+        var messagesResponses = conversation?.Messages.Select(x => new MessageResponse{Id = x.Id, Text = x.Text}).ToList();
+        
+        if (conversation == null)
+        {
+            throw new ConversationNotFoundException();
+        }
+        
+        if (conversation.Participants.All(x => x.Id != currentUser.Id))
+        {
+            throw new AccessToConversationDeniedException();
+        }
+        
+        return new MessagesResponse
+        {
+            Id = conversation.Id,
+            Messages = messagesResponses!
+        };
     }
 }

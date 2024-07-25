@@ -2,12 +2,12 @@
 
 namespace Bonfire.Core.Exceptions;
 
-public class MessageNotFoundException : BaseException
+public class WrongConversationParticipantsIdsException : BaseException
 {
     /// <summary>
     ///     Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
-    public MessageNotFoundException() : base(HttpStatusCode.NotFound, HttpErrors.MessageNotFound)
+    public WrongConversationParticipantsIdsException() : base(HttpStatusCode.BadRequest, HttpErrors.WrongConversationParticipants)
     {
     }
 }

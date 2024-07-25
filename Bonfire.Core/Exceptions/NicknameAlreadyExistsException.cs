@@ -2,12 +2,12 @@
 
 namespace Bonfire.Core.Exceptions;
 
-public class DirectChatNotFoundException : BaseException
+public class NicknameAlreadyExistsException: BaseException
 {
     /// <summary>
     ///     Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
-    public DirectChatNotFoundException() : base(HttpStatusCode.NotFound, HttpErrors.DirectChatNotFound)
+    public NicknameAlreadyExistsException() : base(HttpStatusCode.Conflict, HttpErrors.NicknameAlreadyExists)
     {
     }
 }

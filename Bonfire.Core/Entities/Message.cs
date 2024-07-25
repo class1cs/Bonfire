@@ -1,4 +1,6 @@
-﻿namespace Bonfire.Core.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Bonfire.Core.Entities;
 
 public class Message
 {
@@ -14,11 +16,16 @@ public class Message
         
     }
 
-    public Guid Id { get; set; }
+    public long Id { get; set; }
 
     public string Text { get; set; }
 
     public DateTime SentTime { get; set; }
     
     public User Author { get; set; }
+    
+    public Conversation Conversation { get; set; }
+    
+    public long ConversationId { get; set; }
+    
 }

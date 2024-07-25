@@ -3,16 +3,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Persistance;
 
-public sealed  class AppDbContext : DbContext
+public class AppDbContext : DbContext
 { 
-    public DbSet<User> Users { get; init; }
+    public DbSet<User> Users { get; set; }
     
-    public DbSet<DirectChat> DirectChats { get; init; }
+    public DbSet<Conversation> Conversations { get; set; }
         
-    public DbSet<Message> Messages { get; init; }
+    public DbSet<Message> Messages { get; set; }
+    
     
     public AppDbContext(DbContextOptions options) : base(options)
     {
-        
+        ChangeTracker.LazyLoadingEnabled = false;
     }
+    
 }

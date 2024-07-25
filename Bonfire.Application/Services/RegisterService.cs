@@ -2,6 +2,7 @@
 using Bonfire.Abstractions;
 using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Entities;
+using Bonfire.Core.Exceptions;
 using Bonfire.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,23 +10,23 @@ namespace Bonfire.Application.Services;
 
 public class RegisterService(IPasswordHasherService passwordHasherService, AppDbContext appDbContext, ITokenService tokenService) : IRegisterService
 {
-    public async Task<string> RegisterAsync(RegisterRequestDto registerUserDto)
+    public async Task<string> Register(RegisterRequest registerUser)
     {
-        var passwordHash = passwordHasherService.HashPassword(registerUserDto.Password);
-        var userToAdd = new User(registerUserDto.NickName, passwordHash, new List<DirectChat>());
+        var passwordHash = passwordHasherService.HashPassword(registerUser.Password);
+        var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
 
-        if (await CheckUserExists(registerUserDto.NickName, passwordHash))
+        if (await CheckUserExists(registerUser.NickName))
         {
-            throw new InvalidCredentialException("Этот аккаунт уже существует!");
+            throw new NicknameAlreadyExistsException();
         }
         await appDbContext.Users.AddAsync(userToAdd);
         await appDbContext.SaveChangesAsync();
-        return await tokenService.GenerateToken(userToAdd);
+        return tokenService.GenerateToken(userToAdd);
     }
 
-    public async Task<bool> CheckUserExists(string login, string passwordHash)
+    public async Task<bool> CheckUserExists(string login)
     {
-        var isUserExists = await appDbContext.Users.AsNoTracking().AnyAsync(x => x.NickName == login && x.PasswordHash == passwordHash);
+        var isUserExists = await appDbContext.Users.AsNoTracking().AnyAsync(x => x.Nickname == login);
         return isUserExists;
     }
 }

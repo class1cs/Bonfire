@@ -8,11 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Bonfire.Application.Services;
 
-public class TokenService(AppDbContext appDbContext) : ITokenService
+public class TokenService : ITokenService
 {
-
-    
-    public async Task<string> GenerateToken(User user)
+    public string GenerateToken(User user)
     {
         var claims = new List<Claim>();
         claims.Add(new("Id", user.Id.ToString()));

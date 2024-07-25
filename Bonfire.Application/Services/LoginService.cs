@@ -7,23 +7,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
 
-public class LoginService(ITokenService tokenService, AppDbContext appDbContext, IPasswordHasherService passwordHasherService) : ILoginService
+public class LoginService(ITokenService tokenService, AppDbContext appDbContext) : ILoginService
 {
-    public async Task<string> Login(LoginRequestDto loginRequestDto)
+    public async Task<string> Login(LoginRequest loginRequest)
     {
-        var authorizedUser = await VerifyLoginCredentials(loginRequestDto.NickName, loginRequestDto.Password);
+        var authorizedUser = await VerifyLoginCredentials(loginRequest.NickName, loginRequest.Password);
         if (authorizedUser is null)
         {
             throw new InvalidLoginCredentialsException();
         }
-
-        return await tokenService.GenerateToken(authorizedUser);
+        
+        var token = tokenService.GenerateToken(authorizedUser);
+        return token;
     }
 
     public async Task<User?> VerifyLoginCredentials(string nickName, string password)
     {
         var user = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x =>
-            x.NickName == nickName);
+            x.Nickname == nickName);
         if (user is null)
         {
             throw new InvalidLoginCredentialsException();

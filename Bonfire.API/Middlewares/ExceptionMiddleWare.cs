@@ -4,11 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Middlewares;
 
-public class ExceptionMiddleWare: IExceptionHandler
+public class ExceptionMiddleWare(ILogger<ExceptionMiddleWare> logger) : IExceptionHandler
 {
-    private readonly ILogger<ExceptionMiddleWare> _logger;
-
-    public ExceptionMiddleWare(ILogger<ExceptionMiddleWare> logger) => _logger = logger;
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,

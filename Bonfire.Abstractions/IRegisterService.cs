@@ -4,7 +4,7 @@ namespace Bonfire.Abstractions;
 
 public interface IRegisterService
 {
-    public Task<string> RegisterAsync(RegisterRequestDto registerUserDto);
+    public Task<string> Register(RegisterRequest registerUser);
 
-    public Task<bool> CheckUserExists(string login, string passwordHash);
+    public Task<bool> CheckUserExists(string login);
 }

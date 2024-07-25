@@ -4,5 +4,5 @@ namespace Bonfire.Abstractions;
 
 public interface ITokenService
 {
-    public Task<string> GenerateToken(User user);
+    public string GenerateToken(User user);
 }

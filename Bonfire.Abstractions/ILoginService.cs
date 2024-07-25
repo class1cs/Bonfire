@@ -5,7 +5,7 @@ namespace Bonfire.Abstractions;
 
 public interface ILoginService
 {
-    public Task<string> Login(LoginRequestDto loginRequestDto);
+    public Task<string> Login(LoginRequest loginRequest);
 
     public Task<User?> VerifyLoginCredentials(string nickName, string password);
 }

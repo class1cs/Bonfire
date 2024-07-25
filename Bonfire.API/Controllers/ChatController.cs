@@ -1,52 +1,59 @@
 using System.Security.Claims;
+using Bonfire.Abstractions;
 using Bonfire.Application.Services;
 using Bonfire.Core.Dtos.Requests;
 using Bonfire.Persistance;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.API.Controllers
 {
-    [Route("api/chat/directChats")]
+    [Route("api/[controller]/conversations/")]
     [ApiController]
-    public class ChatController(MessagesService messagesService, AppDbContext dbContext, DirectChatsService directChatsService) : ControllerBase
+    [Authorize]
+    public class ChatController(IMessagesService messagesService,ConversationsService conversationsService) : ControllerBase
     {
-
-        [HttpPost("{directChatId}/")]
-        public async Task<IActionResult> SendMessage(Guid directChatId, [FromBody] MessageRequestDto messageSendRequestDto)
+        [HttpPost("{conversationId:long}/messages")]
+        public async Task<IActionResult> SendMessage(long conversationId, [FromBody] MessageRequest messageRequest)
         {
-            var responseDto = await messagesService.SendMessage(messageSendRequestDto, directChatId);
+            var responseDto = await messagesService.SendMessage(messageRequest, conversationId);
             return Ok(responseDto);
         }
 
-        
-        [HttpPut("{directChatId}/messages/{messageId}/")]
-        public async Task<IActionResult> EditMessage(Guid messageId, Guid directChatId, [FromBody] MessageRequestDto messageRequestDto)
+        [HttpGet("{conversationId:long}/messages")]
+        public async Task<IActionResult> GetMessages(long conversationId, short limit)
         {
-            var responseDto = await messagesService.EditMessage(messageRequestDto, messageId, directChatId);
+            var responseDto = await messagesService.GetMessages(conversationId);
             return Ok(responseDto);
         }
         
-        [HttpDelete("{directChatId}/messages/{messageId}")]
-        public async Task<IActionResult> RemoveMessage(Guid messageId, Guid directChatId)
+        [HttpPut("{conversationId:long}/messages/{messageId:long}")]
+        public async Task<IActionResult> EditMessage(long messageId, long conversationId, [FromBody] MessageRequest messageRequest)
         {
-            var responseDto = await messagesService.RemoveMessage(messageId, directChatId); 
+            var responseDto = await messagesService.EditMessage(messageRequest, messageId, conversationId);
             return Ok(responseDto);
         }
         
-        [HttpPost("{recieverId}")]
-        public async Task<IActionResult> CreateDirectChat(Guid recieverId)
+        [HttpDelete("{conversationId:long}/messages/{messageId:long}")]
+        public async Task<IActionResult> RemoveMessage(long messageId, long conversationId)
         {
-           
-            var responseDto = await directChatsService.CreateDirectChat(recieverId);
+            var responseDto = await messagesService.RemoveMessage(messageId, conversationId); 
             return Ok(responseDto);
         }
         
-        [HttpDelete("{directChatId}")]
-        public async Task<IActionResult> RemoveDirectChat(Guid directChatId)
+        [HttpPost]
+        public async Task<IActionResult> CreateConversation([FromBody] ConversationRequest conversationRequest)
         {
-            var responseDto = await directChatsService.RemoveDirectChat(directChatId);
+            var responseDto = await conversationsService.CreateConversation(conversationRequest);
+            return Ok(responseDto);
+        }
+        
+        [HttpDelete("{conversationId:long}")]
+        public async Task<IActionResult> ExitConversation(long conversationId)
+        {
+            var responseDto = await conversationsService.ExitConversation(conversationId );
             return Ok(responseDto);
         }
     }
