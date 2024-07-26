@@ -70,6 +70,29 @@ public class RegisterServiceTests
         await result.Should().ThrowAsync<NicknameAlreadyExistsException>();
     }
     
+    [Fact(DisplayName = "Регистрация выдает ошибку, если никнейм или пароль пустые")]
+    public async void Register_Should_Give_Error_If_Data_Empty()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        var request = new RegisterRequest { NickName = string.Empty, Password = string.Empty };
+        var passwordHasherService = A.Fake<IPasswordHasherService>();
+        A.CallTo(() => passwordHasherService.HashPassword("test")).WithAnyArguments().Returns("$2a$11$h7D6B.QDKZCSzlHfXa.hpO7bB9ySYwkRdI6VQTxl4sp0K/b6F61Fq");
+        var tokenService = A.Fake<ITokenService>();
+        A.CallTo(() => tokenService.GenerateToken(new User())).WithAnyArguments().Returns("Token");
+        var context = new AppDbContext(options);
+        var registerService = new RegisterService(passwordHasherService, context, tokenService);
+
+        // Act
+        var result = async () =>
+        {
+            await registerService.Register(request);
+        };
+        
+        // Assert
+        await result.Should().ThrowAsync<InvalidRegistrationDataException>();
+    }
+    
     [Fact(DisplayName = "Проверка существования юзеров возращает TRUE, если юзер существует")]
     public async void Check_User_Exists_Returns_True_If_User_Exists()
     {

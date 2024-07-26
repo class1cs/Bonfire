@@ -12,7 +12,7 @@ public class HttpErrors
     
     public const string MessageNotFound = "Посмотри лучше! Такого сообщения не существует!";
     
-    public const string InvalidLoginCredentials = "Проверь, правильные-ли данные ты ввёл, дружище!";
+    public const string InvalidLoginCredentials = "Проверь, правильные ли данные для входа ты ввёл, дружище!";
     
     public const string ReceiverEqualsSenderException = "Ты не можешь написать самому себе!";
 
@@ -22,4 +22,6 @@ public class HttpErrors
 
     public const string WrongConversationParticipants =
         "Один или несколько пользователей из списка участников беседы не найдены!";
+
+    public const string InvalidRegistrationData = "Логин или пароль не введены. Введите их для регистрации.";
 }

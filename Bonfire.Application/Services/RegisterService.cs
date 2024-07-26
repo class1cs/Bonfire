@@ -15,6 +15,11 @@ public class RegisterService(IPasswordHasherService passwordHasherService, AppDb
         var passwordHash = passwordHasherService.HashPassword(registerUser.Password);
         var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
 
+        if (string.IsNullOrWhiteSpace(registerUser.NickName) || string.IsNullOrWhiteSpace(registerUser.Password))
+        {
+            throw new InvalidRegistrationDataException();
+        }
+        
         if (await CheckUserExists(registerUser.NickName))
         {
             throw new NicknameAlreadyExistsException();

@@ -1,16 +1,5 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\class1c\AppData\Local\JetBrains\Rider2024.1\resharper-host\temp\Rider\vAny\CoverageData\_Bonfire.1787450279\Snapshot\snapshot.utdcvr</s:String>
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f45f4d58_002Df98f_002D4b6d_002D8f95_002D9b5de4da16a0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="UserServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Or&gt;&#xD;
-    &lt;Not&gt;&#xD;
-      &lt;TestAncestor&gt;&#xD;
-        &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.ConversationsServiceTests.Conversation_Should_Not_Be_Removed_If_It_Is_Not_Existing&lt;/TestId&gt;&#xD;
-        &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.ConversationsServiceTests.Conversation_Should_Not_Be_Removed_If_User_Does_Not_Own_it&lt;/TestId&gt;&#xD;
-      &lt;/TestAncestor&gt;&#xD;
-    &lt;/Not&gt;&#xD;
-    &lt;TestAncestor&gt;&#xD;
-      &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.ConversationsServiceTests.Conversation_Should_Not_Be_Removed_If_It_Is_Not_Existing&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.ConversationsServiceTests.Conversation_Should_Not_Be_Removed_If_User_Does_Not_Own_it&lt;/TestId&gt;&#xD;
-    &lt;/TestAncestor&gt;&#xD;
-  &lt;/Or&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
