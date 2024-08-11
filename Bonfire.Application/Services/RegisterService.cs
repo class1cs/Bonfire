@@ -12,9 +12,6 @@ public class RegisterService(IPasswordHasherService passwordHasherService, AppDb
 {
     public async Task<string> Register(RegisterRequest registerUser)
     {
-        var passwordHash = passwordHasherService.HashPassword(registerUser.Password);
-        var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
-
         if (string.IsNullOrWhiteSpace(registerUser.NickName) || string.IsNullOrWhiteSpace(registerUser.Password))
         {
             throw new InvalidRegistrationDataException();
@@ -24,6 +21,10 @@ public class RegisterService(IPasswordHasherService passwordHasherService, AppDb
         {
             throw new NicknameAlreadyExistsException();
         }
+        
+        var passwordHash = passwordHasherService.HashPassword(registerUser.Password);
+        var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
+
         await appDbContext.Users.AddAsync(userToAdd);
         await appDbContext.SaveChangesAsync();
         return tokenService.GenerateToken(userToAdd);

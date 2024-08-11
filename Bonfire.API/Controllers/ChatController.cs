@@ -13,7 +13,7 @@ namespace Bonfire.API.Controllers
     [Route("api/[controller]/conversations/")]
     [ApiController]
     [Authorize]
-    public class ChatController(IMessagesService messagesService,ConversationsService conversationsService) : ControllerBase
+    public class ChatController(IMessagesService messagesService, IConversationsService conversationsService) : ControllerBase
     {
         [HttpPost("{conversationId:long}/messages")]
         public async Task<IActionResult> SendMessage(long conversationId, [FromBody] MessageRequest messageRequest)
@@ -23,9 +23,9 @@ namespace Bonfire.API.Controllers
         }
 
         [HttpGet("{conversationId:long}/messages")]
-        public async Task<IActionResult> GetMessages(long conversationId, short limit)
+        public async Task<IActionResult> GetMessages(long conversationId, short limit = 50, long offsetMessageId = 0)
         {
-            var responseDto = await messagesService.GetMessages(conversationId);
+            var responseDto = await messagesService.GetMessages(conversationId, offsetMessageId, limit);
             return Ok(responseDto);
         }
         
@@ -50,10 +50,10 @@ namespace Bonfire.API.Controllers
             return Ok(responseDto);
         }
         
-        [HttpDelete("{conversationId:long}")]
-        public async Task<IActionResult> ExitConversation(long conversationId)
+        [HttpGet]
+        public async Task<IActionResult> GetConversations(short limit = 50, long offsetConversationId = 0)
         {
-            var responseDto = await conversationsService.ExitConversation(conversationId );
+            var responseDto = await conversationsService.GetConversations(offsetConversationId, limit);
             return Ok(responseDto);
         }
     }

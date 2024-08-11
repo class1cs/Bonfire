@@ -6,5 +6,5 @@ namespace Bonfire.Abstractions;
 public interface IConversationsService
 {
     Task<ConversationResponse> CreateConversation(ConversationRequest conversationRequest);
-    Task<ConversationResponse> ExitConversation(long conversationId);
+    Task<List<ConversationResponse>> GetConversations(long offsetMessageId, short limit);
 }

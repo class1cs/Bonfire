@@ -20,8 +20,7 @@ public class HttpErrors
     
     public const string MessageCannotBeEmpty = "Текст сообщения не может быть пустым. Напиши что-нибудь!";
 
-    public const string WrongConversationParticipants =
-        "Один или несколько пользователей из списка участников беседы не найдены!";
+    public const string WrongConversationParticipants = "Один или несколько пользователей из списка получателей не найдены!";
 
     public const string InvalidRegistrationData = "Логин или пароль не введены. Введите их для регистрации.";
 }

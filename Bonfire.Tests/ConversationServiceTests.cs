@@ -38,7 +38,7 @@ public class ConversationsServiceTests
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
         
@@ -62,7 +62,7 @@ public class ConversationsServiceTests
         // Arrange
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
         var context = new AppDbContext(options);
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
@@ -98,7 +98,7 @@ public class ConversationsServiceTests
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
        
@@ -117,7 +117,7 @@ public class ConversationsServiceTests
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
-        result.Participants.Should().NotBeNullOrEmpty();
+        result.Participants.Count.Should().NotBe(0);
     }
     
     [Fact(DisplayName = "При попытке создания диалога с самим собой, должна выдаваться ошибка")]
@@ -130,7 +130,7 @@ public class ConversationsServiceTests
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
        
@@ -154,6 +154,36 @@ public class ConversationsServiceTests
 
     }
     
+    [Fact(DisplayName = "При получении переписок (диалоги и групповые чаты), должно возращать список переписок")]
+    public async void Conversation_Should_Be_Returned_As_List()
+    {
+        // Arrange
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        var context = new AppDbContext(options);
+        
+        var user = CreateUser();
+        var user1 = CreateUser(2, "test1");
+        
+        var currentUserService = A.Fake<IUserService>();
+        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        var conversationsService = new ConversationsService(context, currentUserService);
+       
+        var participantsIds = new List<long> { user1.Id };
+        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
+        var conversation = new Conversation(new List<Message>(), new List<User>(receivers){user}, ConversationType.Dialogue);
+        
+        await context.AddRangeAsync(user, user1);
+        await context.AddAsync(conversation);
+        await context.SaveChangesAsync();
+        
+        // Act
+        var result = await conversationsService.GetConversations();
+        
+        // Assert
+        result.Count.Should().NotBe(0);
+
+    }
+    
     [Fact(DisplayName = "При попытке создания переписки, где в списке пользователей несуществующий Id, должна выдаться ошибка")]
     public async void Conversation_Should_Not_Be_Created_If_Users_Ids_Is_Wrong()
     {
@@ -164,7 +194,7 @@ public class ConversationsServiceTests
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
        
@@ -185,66 +215,6 @@ public class ConversationsServiceTests
         
         // Assert
         await result.Should().ThrowAsync<WrongConversationParticipantsIdsException>();
-
-    }
-    
-    [Fact(DisplayName = "При попытке выйти из переписки, которая не существует, должна выдаваться ошибка.")]
-    public async void Conversation_Should_Not_Be_Removed_If_It_Is_Not_Existing()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        var context = new AppDbContext(options);
-        
-        var user = CreateUser();
-        
-        var currentUserService = A.Fake<ICurrentUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var conversationsService = new ConversationsService(context, currentUserService);
-        
-        await context.AddAsync(user);
-        await context.SaveChangesAsync();
-        
-        // Act
-        var result =  async() =>
-        {
-            await conversationsService.ExitConversation(1);
-        };
-        
-        // Assert
-        await result.Should().ThrowAsync<ConversationNotFoundException>();
-
-    }
-    
-    [Fact(DisplayName = "При попытке выйти из чужой переписки должна выдываться ошибка.")]
-    public async void Conversation_Should_Not_Be_Removed_If_User_Does_Not_Own_it()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        var context = new AppDbContext(options);
-        
-        var user = CreateUser();
-        var user1 = CreateUser(2, "test1");
-        
-        var currentUserService = A.Fake<ICurrentUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var conversationsService = new ConversationsService(context, currentUserService);
-        var participantsIds = new List<long> { user1.Id };
-        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
-        var conversation = new Conversation(new List<Message>(), new List<User>(receivers), ConversationType.Conversation);
-        
-        await context.AddRangeAsync(user, user1);
-        await context.AddAsync(conversation);
-        await context.SaveChangesAsync();
-
-        
-        // Act
-        var result =  async() =>
-        {
-            await conversationsService.ExitConversation(1);
-        };
-        
-        // Assert
-        await result.Should().ThrowAsync<AccessToConversationDeniedException>();
 
     }
 }

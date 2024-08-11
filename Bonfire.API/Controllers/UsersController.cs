@@ -1,25 +1,26 @@
 using Bonfire.Abstractions;
-using Bonfire.Core.Dtos.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
-    public class UsersController(ILoginService loginService, IRegisterService registerService) : ControllerBase
+    public class UsersController(IUserInfoService userInfoService) : ControllerBase
     {
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest registerRequest)
+        [HttpGet("{searchRequest}")]
+        public async Task<IActionResult> SearchUsers(string searchRequest)
         {
-            var responseDto = await registerService.Register(registerRequest);
+            var responseDto = await userInfoService.SearchUser(searchRequest);
             return Ok(responseDto);
         }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest loginRequest)
+        
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentUserInfo()
         {
-            var responseDto = await loginService.Login(loginRequest);
+            var responseDto = await userInfoService.GetCurrentUserInfo();
             return Ok(responseDto);
         }
     }

@@ -12,6 +12,7 @@ public class TokenService : ITokenService
 {
     public string GenerateToken(User user)
     {
+        
         var claims = new List<Claim>();
         claims.Add(new("Id", user.Id.ToString()));
 

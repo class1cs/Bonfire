@@ -9,6 +9,7 @@ using Bonfire.Persistance;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Tests;
@@ -34,7 +35,8 @@ public class MessagesServiceTests
         var context = new AppDbContext(options);
         var user = CreateUser();
       
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
+        
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         var messagesService = new MessagesService(context, currentUserService);
         
@@ -51,6 +53,8 @@ public class MessagesServiceTests
         
         // Assert
         result.Should().NotBeNull();
+        result.Author.Should().NotBeNull();
+        result.Author.NickName.Should().Be("test");
         result.Text.Should().Be("test");
         result.Id.Should().Be(1);
     }
@@ -62,10 +66,10 @@ public class MessagesServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
         var context = new AppDbContext(options);
         var user = CreateUser();
-      
-        var currentUserService = A.Fake<ICurrentUserService>();
+        
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -95,9 +99,9 @@ public class MessagesServiceTests
         
         var user = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
         await context.AddAsync(user);
         await context.SaveChangesAsync();
@@ -121,10 +125,10 @@ public class MessagesServiceTests
         var context = new AppDbContext(options);
         var user = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -152,12 +156,12 @@ public class MessagesServiceTests
         var context = new AppDbContext(options);
         var user = CreateUser();
         var user1 = CreateUser("test1", 2);
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message>{new Message("text", DateTime.Now, user)};
+        var messages = new List<Message>{new Message("text", user)};
         var participants = new List<User> { user, user1 };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -181,12 +185,12 @@ public class MessagesServiceTests
         var context = new AppDbContext(options);
         var user = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message>{ new("test", DateTime.Now, user) };
+        var messages = new List<Message>{ new("test", user) };
         var participants = new List<User> { user };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         var secondConversation = new Conversation(new List<Message>(), participants, ConversationType.Conversation);
@@ -215,12 +219,12 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
         var secondUser = CreateUser(id: 2, name: "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> { new("test", DateTime.Now, secondUser) };
+        var messages = new List<Message> { new("test", secondUser) };
         var participants = new List<User> { secondUser, firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -247,9 +251,9 @@ public class MessagesServiceTests
         
         var user = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -276,12 +280,12 @@ public class MessagesServiceTests
         var context = new AppDbContext(options);
         var user = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message>{ new("test", DateTime.Now, user) };
+        var messages = new List<Message>{ new("test", user) };
         var participants = new List<User> { user };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         var secondConversation = new Conversation(new List<Message>(), participants, ConversationType.Conversation);
@@ -310,12 +314,12 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
         var secondUser = CreateUser(id: 2, name: "test1");
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
         
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> { new("test", DateTime.Now, secondUser) };
+        var messages = new List<Message> { new("test", secondUser) };
         var participants = new List<User> { secondUser, firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -345,11 +349,11 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
         var secondUser = CreateUser("test1", 2);
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> { new("test", DateTime.Now, secondUser) };
+        var messages = new List<Message> { new("test", secondUser) };
         var participants = new List<User> { secondUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -368,7 +372,7 @@ public class MessagesServiceTests
         await result.Should().ThrowAsync<AccessToConversationDeniedException>();
     }
     
-    [Fact(DisplayName = "При попытке получения сообщений при несуществующей переписке должна выдываться ошибка.")]
+    [Fact(DisplayName = "При попытке получения сообщений при несуществующей переписке должна выдаваться ошибка.")]
     public async void Messages_Should_Not_Be_Given_If_Conversation_Does_Not_Exist()
     {
         // Arrange
@@ -378,14 +382,14 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
         var secondUser = CreateUser("test1", 2);
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
         await context.AddAsync(firstUser);
         await context.AddAsync(secondUser);
         
-        var messages = new List<Message> { new("test", DateTime.Now, secondUser) };
+        var messages = new List<Message> { new("test", secondUser) };
         var participants = new List<User> { secondUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -411,11 +415,11 @@ public class MessagesServiceTests
         
         var firstUser = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> {new("test", DateTime.Now, firstUser)};
+        var messages = new List<Message> {new("test", firstUser)};
         var participants = new List<User>{firstUser};
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -428,6 +432,8 @@ public class MessagesServiceTests
         
         // Assert
         result.Should().NotBeNull();
+        result.Author.Should().NotBeNull();
+        result.Author.NickName.Should().Be("test");
         result.Text.Should().Be("tests");
         result.Id.Should().Be(1);
     }
@@ -441,11 +447,11 @@ public class MessagesServiceTests
         
         var firstUser = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> {new("test", DateTime.Now, firstUser)};
+        var messages = new List<Message> {new("test", firstUser)};
         var participants = new List<User>{firstUser};
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -472,11 +478,11 @@ public class MessagesServiceTests
         
         var firstUser = CreateUser();
         
-        var currentUserService = A.Fake<ICurrentUserService>();
+        var currentUserService = A.Fake<IUserService>();
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+         var messagesService = new MessagesService(context, currentUserService);
         
-        var messages = new List<Message> {new("test", DateTime.Now, firstUser)};
+        var messages = new List<Message> {new("test", firstUser)};
         var participants = new List<User>{firstUser};
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         
@@ -489,6 +495,8 @@ public class MessagesServiceTests
         
         // Assert
         result.Should().NotBeNull();
+        result.Author.Should().NotBeNull();
+        result.Author.NickName.Should().Be("test");
         result.Text.Should().Be("test");
         result.Id.Should().Be(1);
     }
