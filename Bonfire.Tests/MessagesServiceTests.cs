@@ -174,8 +174,9 @@ public class MessagesServiceTests
         var result = await messagesService.GetMessages(conversation.Id);
         
         // Assert
-        result.Messages.Count.Should().Be(1);
+        result.Messages.Length.Should().Be(1);
     }
+    
     
     [Fact(DisplayName = "При попытке редактирования своего сообщения не в той переписке должна выдаваться ошибка.")]
     public async void Message_Should_Not_Be_Edited_If_Conversation_Is_Wrong()

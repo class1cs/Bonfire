@@ -6,5 +6,5 @@ public class MessagesResponse
 {
     public required long Id { get; set; }
     
-    public required List<MessageResponse> Messages { get; set; }
+    public required MessageResponse[] Messages { get; set; }
 }

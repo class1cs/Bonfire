@@ -26,7 +26,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Bonfire.Application\Bonfire.Application.csproj" />
-      <ProjectReference Include="..\Bonfire.Persistance\Bonfire.Persistance.csproj" />
+      <ProjectReference Include="..\Bonfire.Persistence\Bonfire.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

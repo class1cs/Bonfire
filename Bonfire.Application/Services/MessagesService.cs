@@ -107,7 +107,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             throw new MessageNotFoundException();
         }
         
-        if (message?.Author?.Id != currentUser?.Id) 
+        if (message.Author.Id != currentUser.Id) 
         {
             throw new AccessToMessageDeniedException();
         }
@@ -139,7 +139,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             .FirstOrDefaultAsync(x => x.Id == conversationId);
         var messagesResponses = conversation?.Messages
             .Select(x => new MessageResponse{ Id = x.Id, Text = x.Text, Author = new UserResponse { Id = x.Author.Id, NickName = x.Author.Nickname}, SentTime = x.SentTime})
-            .ToList();
+            .ToArray();
         
         if (conversation == null)
         {

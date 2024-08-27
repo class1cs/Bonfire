@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Bonfire.Abstractions\Bonfire.Abstractions.csproj" />
-      <ProjectReference Include="..\Bonfire.Persistance\Bonfire.Persistance.csproj" />
+      <ProjectReference Include="..\Bonfire.Persistence\Bonfire.Persistence.csproj" />
       <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
 

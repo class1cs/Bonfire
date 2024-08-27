@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Core", "Bonfire.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Application", "Bonfire.Application\Bonfire.Application.csproj", "{51193834-9ECB-4A12-AF91-2E35803994EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Persistance", "Bonfire.Persistance\Bonfire.Persistance.csproj", "{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Persistence", "Bonfire.Persistence\Bonfire.Persistence.csproj", "{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Abstractions", "Bonfire.Abstractions\Bonfire.Abstractions.csproj", "{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}"
 EndProject
