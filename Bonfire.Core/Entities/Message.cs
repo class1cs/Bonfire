@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Bonfire.Core.Entities;
+﻿namespace Bonfire.Core.Entities;
 
 public class Message
 {
@@ -12,7 +10,6 @@ public class Message
 
     public Message()
     {
-        
     }
 
     public long Id { get; set; }
@@ -20,11 +17,10 @@ public class Message
     public string Text { get; set; }
 
     public DateTime SentTime { get; } = DateTime.Now.ToLocalTime();
-    
+
     public User Author { get; set; }
-    
+
     public Conversation Conversation { get; set; }
-    
+
     public long ConversationId { get; set; }
-    
 }

@@ -8,16 +8,15 @@ public class User
         PasswordHash = passwordHash;
         Conversations = conversations;
     }
-    
+
     public User()
     {
-        
     }
-    
+
     public long Id { get; set; }
-    
+
     public string Nickname { get; set; }
-    
+
     public string PasswordHash { get; set; }
 
     public ICollection<Conversation> Conversations { get; set; }

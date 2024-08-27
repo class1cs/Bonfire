@@ -22,46 +22,48 @@ public class UserInfoServiceTests
 
         return user;
     }
-    
+
     [Fact(DisplayName = "Должно возвращать текущего пользователя, если  токен верен.")]
     public async void User_Should_Be_Returned_If_Token_Is_Right()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
         var context = new AppDbContext(options);
-        
+
         var httpContextAccessor = A.Fake<IHttpContextAccessor>();
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
         var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim("Id", "1")));
         A.CallTo(() => httpContextAccessor.HttpContext.User.Identity.IsAuthenticated).Returns(true);
         A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
-        
-        
+
+
         var user = CreateUser();
         await context.AddAsync(user);
         await context.SaveChangesAsync();
-        
+
 
         var userInfoService = new UserService(httpContextAccessor, context);
-        
+
         // Act
         var result = await userInfoService.GetCurrentUser();
-        
+
         // Assert
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
     }
-    
+
     [Fact(DisplayName = "Должно возвращать пользователей по имени при поиске.")]
     public async void Should_Return_User_If_Data_Correct()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
         var context = new AppDbContext(options);
-        
+
         var user = CreateUser();
         var user1 = CreateUser("test1", 2);
         var httpContextAccessor = A.Fake<IHttpContextAccessor>();
@@ -72,27 +74,28 @@ public class UserInfoServiceTests
         var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim("Id", "1")));
         A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated).Returns(true);
         A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
-        
+
         await context.AddRangeAsync(user, user1);
         await context.SaveChangesAsync();
         var userInfoService = new UserInfoService(currentUserService, context);
-        
+
         // Act
         var result = await userInfoService.SearchUser("test");
-        
+
         // Assert
         result.Count.Should().Be(1);
         result[0].NickName.Should().Be("test1");
     }
-    
+
     [Fact(DisplayName = "Должно возвращать пустой список при поиске, если пользователи, кроме текущего, не найдены.")]
     public async void Should_Return_Blank_List_If_User_Except_Current_Not_Found()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
-        
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
         var context = new AppDbContext(options);
-        
+
         var user = CreateUser();
         var httpContextAccessor = A.Fake<IHttpContextAccessor>();
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
@@ -101,12 +104,12 @@ public class UserInfoServiceTests
         A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
         await context.AddAsync(user);
         await context.SaveChangesAsync();
-        
+
         var userInfoService = new UserInfoService(currentUserService, context);
-        
+
         // Act
         var result = await userInfoService.SearchUser("test");
-        
+
         // Assert
         result.Count.Should().Be(0);
     }

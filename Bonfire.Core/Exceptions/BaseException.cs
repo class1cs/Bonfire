@@ -12,7 +12,10 @@ public class BaseException : Exception
     /// </summary>
     /// <param name="errorCode">Код ошибки.</param>
     /// <param name="message">Описание ошибки.</param>
-    public BaseException(HttpStatusCode errorCode, string message) : base(message) => ErrorCode = errorCode;
+    public BaseException(HttpStatusCode errorCode, string message) : base(message)
+    {
+        ErrorCode = errorCode;
+    }
 
     /// <summary>
     ///     Код ответа сервера.

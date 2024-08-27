@@ -6,20 +6,16 @@ namespace Bonfire.API.Middlewares;
 
 public class ExceptionMiddleware : IExceptionHandler
 {
-
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is not BaseException baseException)
-        {
-            return false;
-        }
+        if (exception is not BaseException baseException) return false;
 
         var problemDetails = new ProblemDetails
         {
-            Status = (int) baseException.ErrorCode,
+            Status = (int)baseException.ErrorCode,
             Title = baseException.Message
         };
 

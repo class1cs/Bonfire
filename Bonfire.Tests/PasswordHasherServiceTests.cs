@@ -13,10 +13,9 @@ public class PasswordHasherServiceTests
         var hasher = A.Fake<PasswordHasherService>();
         // Act
         var hash = hasher.HashPassword("test");
-        
+
         // Assert
         var verifyHash = BCrypt.Net.BCrypt.EnhancedVerify("test", hash);
         verifyHash.Should().BeTrue();
-
     }
 }

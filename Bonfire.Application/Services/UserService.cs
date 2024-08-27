@@ -10,11 +10,11 @@ public class UserService(IHttpContextAccessor httpContextAccessor, AppDbContext 
 {
     public async Task<User> GetCurrentUser()
     {
-        var currentUserIdString = httpContextAccessor.HttpContext!.User.Claims.FirstOrDefault(x => x.Type == "Id")!.Value;
+        var currentUserIdString =
+            httpContextAccessor.HttpContext!.User.Claims.FirstOrDefault(x => x.Type == "Id")!.Value;
         var currentUserIdLong = Convert.ToInt64(currentUserIdString);
-        var currentUser = await appDbContext.Users.Include(x => x.Conversations).FirstOrDefaultAsync(x => x.Id == currentUserIdLong);
+        var currentUser = await appDbContext.Users.Include(x => x.Conversations)
+            .FirstOrDefaultAsync(x => x.Id == currentUserIdLong);
         return currentUser!;
     }
-    
-    
 }

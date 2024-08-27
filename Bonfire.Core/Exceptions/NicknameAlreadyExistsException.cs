@@ -2,7 +2,7 @@
 
 namespace Bonfire.Core.Exceptions;
 
-public class NicknameAlreadyExistsException: BaseException
+public class NicknameAlreadyExistsException : BaseException
 {
     /// <summary>
     ///     Конструктор исключения, в котором указывается код и текст ошибки.

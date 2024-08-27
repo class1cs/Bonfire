@@ -5,18 +5,16 @@ using Bonfire.Persistance;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,
@@ -36,7 +34,7 @@ builder.Services.AddSwaggerGen(c =>
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 },
-                In = ParameterLocation.Header,
+                In = ParameterLocation.Header
             },
             new List<string>()
         }
@@ -44,7 +42,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddProblemDetails();           
+builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionMiddleware>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
@@ -67,7 +65,6 @@ builder.Services.AddCors(options =>
         corsPolicyBuilder.AllowAnyMethod();
         corsPolicyBuilder.AllowAnyHeader();
     });
-
 });
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,21 +76,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = AuthOptions.Issuer,
             ValidateAudience = true,
             ValidAudience = AuthOptions.Audience,
-            
+
             ValidateLifetime = true,
-            
+
             IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true
         };
     });
 
 
-
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseNpgsql(connString);
-});
+builder.Services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connString); });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -102,6 +95,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors();
 app.UseHttpsRedirection();
 app.MapControllers();

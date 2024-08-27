@@ -12,11 +12,8 @@ public class LoginService(ITokenService tokenService, AppDbContext appDbContext)
     public async Task<string> Login(LoginRequest loginRequest)
     {
         var authorizedUser = await VerifyLoginCredentials(loginRequest.NickName, loginRequest.Password);
-        if (authorizedUser is null)
-        {
-            throw new InvalidLoginCredentialsException();
-        }
-        
+        if (authorizedUser is null) throw new InvalidLoginCredentialsException();
+
         var token = tokenService.GenerateToken(authorizedUser);
         return token;
     }
@@ -25,10 +22,7 @@ public class LoginService(ITokenService tokenService, AppDbContext appDbContext)
     {
         var user = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x =>
             x.Nickname == nickName);
-        if (user is null)
-        {
-            throw new InvalidLoginCredentialsException();
-        }
+        if (user is null) throw new InvalidLoginCredentialsException();
         var passwordMatch = BCrypt.Net.BCrypt.EnhancedVerify(password, user?.PasswordHash);
         return passwordMatch ? user : null;
     }

@@ -1,9 +1,6 @@
-﻿using Bonfire.Abstractions;
-using Bonfire.Application.Services;
+﻿using Bonfire.Application.Services;
 using Bonfire.Core.Entities;
-using Bonfire.Core.Exceptions;
 using Bonfire.Persistance;
-using FakeItEasy;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,27 +19,27 @@ public class TokenServiceTests
         return user;
     }
 
-    
+
     [Fact(DisplayName = "Возврат токена при передаче юзера.")]
     public async void Login_Should_Fail_If_Login_Data_Incorrect()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
         var context = new AppDbContext(options);
-        
+
         var user = CreateUser();
-        
+
         var tokenService = new TokenService();
 
         await context.AddAsync(user);
         await context.SaveChangesAsync();
-        
+
         // Act
         var result = tokenService.GenerateToken(user);
-        
-        
+
+
         // Assert
         result.Should().NotBeNullOrWhiteSpace();
-
     }
 }

@@ -12,13 +12,13 @@ public class Conversation
     public Conversation()
     {
     }
-    
+
     public long Id { get; set; }
 
     public ICollection<Message> Messages { get; set; }
-    
+
     public ICollection<User> Participants { get; set; }
-    
+
     public ConversationType Type { get; set; }
 }
 

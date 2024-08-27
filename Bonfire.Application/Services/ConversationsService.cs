@@ -13,30 +13,25 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
     public async Task<ConversationResponse> CreateConversation(ConversationRequest conversationRequest)
     {
         var currentUser = await userService.GetCurrentUser();
-        
+
         var receivers = await dbContext.Users.Where(u => conversationRequest.UsersIds.Contains(u.Id)).ToListAsync();
 
         if (receivers.Count != conversationRequest.UsersIds.Count)
-        {
             throw new WrongConversationParticipantsIdsException();
-        }
-        
-        if (receivers.Contains(currentUser))
-        {
-            throw new ReceiverEqualsSenderException();
-        } 
-        
+
+        if (receivers.Contains(currentUser)) throw new ReceiverEqualsSenderException();
+
         receivers.Add(currentUser);
-        
+
         var participants = new List<User>(receivers);
         var conversationType = receivers.Count > 2 ? ConversationType.Conversation : ConversationType.Dialogue;
-        
-        
+
+
         var existingChat = await dbContext.Conversations.Include(x => x.Participants)
-            .FirstOrDefaultAsync(p => p.Participants.All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
-        
+            .FirstOrDefaultAsync(p =>
+                p.Participants.All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
+
         if (existingChat is not null && conversationType == ConversationType.Dialogue)
-        {
             return new ConversationResponse
             {
                 ConversationType = existingChat.Type,
@@ -47,13 +42,12 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
                     NickName = x.Nickname
                 }).ToList()
             };
-        }
-        
+
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
-        
+
         await dbContext.Conversations.AddAsync(conversation);
         await dbContext.SaveChangesAsync();
-        
+
         return new ConversationResponse
         {
             ConversationType = conversation.Type,
@@ -65,7 +59,7 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             }).ToList()
         };
     }
-    
+
     public async Task<List<ConversationResponse>> GetConversations(long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();

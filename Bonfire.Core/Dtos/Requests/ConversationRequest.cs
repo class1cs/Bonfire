@@ -1,6 +1,4 @@
-﻿using Bonfire.Core.Entities;
-
-namespace Bonfire.Core.Dtos.Requests;
+﻿namespace Bonfire.Core.Dtos.Requests;
 
 public class ConversationRequest
 {
