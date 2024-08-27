@@ -1,4 +1,4 @@
-using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Core.Dtos.Requests;
 using Microsoft.AspNetCore.Mvc;
 

@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Application", "Bonf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Persistence", "Bonfire.Persistence\Bonfire.Persistence.csproj", "{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Abstractions", "Bonfire.Abstractions\Bonfire.Abstractions.csproj", "{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Tests", "Bonfire.Tests\Bonfire.Tests.csproj", "{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}"
 EndProject
 Global
@@ -34,10 +32,6 @@ Global
 		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2C2C452-CE4C-4FFE-9E56-DBEBF988F1FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Release|Any CPU.ActiveCfg = Release|Any CPU

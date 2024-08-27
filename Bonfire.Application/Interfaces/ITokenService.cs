@@ -1,6 +1,6 @@
 ﻿using Bonfire.Core.Entities;
 
-namespace Bonfire.Abstractions;
+namespace Bonfire.Application.Interfaces;
 
 public interface ITokenService
 {

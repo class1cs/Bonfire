@@ -1,4 +1,4 @@
-﻿namespace Bonfire.Application.Services;
+﻿namespace Bonfire.Application.Interfaces;
 
 public interface IPasswordHasherService
 {

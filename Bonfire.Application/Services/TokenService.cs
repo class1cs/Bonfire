@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Core.Entities;
 using Bonfire.Persistance;
 using Microsoft.IdentityModel.Tokens;

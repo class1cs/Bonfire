@@ -1,4 +1,5 @@
 ﻿using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Dtos.Response;
 using Bonfire.Core.Entities;
@@ -111,7 +112,12 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         var messagesResponses = conversation?.Messages
             .Select(x => new MessageResponse
             {
-                Id = x.Id, Text = x.Text, Author = new UserResponse { Id = x.Author.Id, NickName = x.Author.Nickname },
+                Id = x.Id, Text = x.Text,
+                Author = new UserResponse
+                {
+                    Id = x.Author.Id,
+                    NickName = x.Author.Nickname
+                },
                 SentTime = x.SentTime
             })
             .ToArray();

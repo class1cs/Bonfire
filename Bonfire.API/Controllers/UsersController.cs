@@ -1,4 +1,4 @@
-using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

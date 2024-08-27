@@ -60,7 +60,8 @@ public class MessagesServiceTests
     public async void Message_Should_Not_Be_Sent_If_Text_Is_Empty()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var context = new AppDbContext(options);
         var user = CreateUser();
@@ -80,7 +81,11 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.SendMessage(new MessageRequest { Text = string.Empty }, conversation.Id);
+            await messagesService.SendMessage(new MessageRequest
+                {
+                    Text = string.Empty
+                },
+                conversation.Id);
         };
 
         // Assert
@@ -91,7 +96,8 @@ public class MessagesServiceTests
     public async void Message_Should_Not_Be_Sent_If_Conversation_Does_Not_Exists()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var context = new AppDbContext(options);
 
@@ -105,7 +111,14 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.SendMessage(new MessageRequest { Text = "test" }, 3); };
+        var result = async () =>
+        {
+            await messagesService.SendMessage(new MessageRequest
+                {
+                    Text = "test"
+                },
+                3);
+        };
 
         // Assert
         await result.Should().ThrowAsync<ConversationNotFoundException>();

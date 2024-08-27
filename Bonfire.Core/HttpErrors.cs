@@ -1,8 +1,8 @@
 ﻿namespace Bonfire.Core;
 
-public class HttpErrors
+public static class HttpErrors
 {
-    public const string ConversationNotFoundException = "Дружище, этой переписки не существует!";
+    public const string ConversationNotFoundException = "";
 
     public const string AccessToMessageDenied = "Эй! У тебя нет доступа к этому сообщению!";
 

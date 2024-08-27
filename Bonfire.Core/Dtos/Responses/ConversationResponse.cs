@@ -6,7 +6,7 @@ public class ConversationResponse
 {
     public required long Id { get; set; }
 
-    public required List<UserResponse> Participants { get; set; }
+    public required UserResponse[] Participants { get; set; }
 
     public required ConversationType ConversationType { get; set; }
 }

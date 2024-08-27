@@ -1,5 +1,6 @@
 using Bonfire.Abstractions;
 using Bonfire.API.Middlewares;
+using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
 using Bonfire.Persistance;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,7 +48,6 @@ builder.Services.AddExceptionHandler<ExceptionMiddleware>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
-builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddScoped<IConversationsService, ConversationsService>();
 builder.Services.AddScoped<IMessagesService, MessagesService>();
 builder.Services.AddScoped<IUserInfoService, UserInfoService>();

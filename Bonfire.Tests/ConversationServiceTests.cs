@@ -49,7 +49,7 @@ public class ConversationsServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
-        result.Participants.Count.Should().Be(2);
+        result.Participants.Length.Should().Be(2);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
     }
 
@@ -82,7 +82,7 @@ public class ConversationsServiceTests
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Conversation);
-        result.Participants.Count.Should().Be(4);
+        result.Participants.Length.Should().Be(4);
     }
 
     [Fact(DisplayName = "При создании диалога, который уже существует, должна возвращаться информация о нём.")]
@@ -117,7 +117,7 @@ public class ConversationsServiceTests
         result.Should().NotBeNull();
         result.Id.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
-        result.Participants.Count.Should().NotBe(0);
+        result.Participants.Length.Should().NotBe(0);
     }
 
     [Fact(DisplayName = "При попытке создания диалога с самим собой, должна выдаваться ошибка")]
@@ -183,7 +183,7 @@ public class ConversationsServiceTests
         var result = await conversationsService.GetConversations();
 
         // Assert
-        result.Count.Should().NotBe(0);
+        result.Length.Should().NotBe(0);
     }
 
     [Fact(DisplayName =

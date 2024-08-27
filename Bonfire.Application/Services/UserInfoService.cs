@@ -1,4 +1,5 @@
 ﻿using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Core.Dtos.Response;
 using Bonfire.Persistance;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,12 @@ public class UserInfoService(IUserService userService, AppDbContext appDbContext
         };
     }
 
-    public async Task<List<UserResponse>> SearchUser(string searchRequest)
+    public async Task<UserResponse[]> SearchUser(string searchRequest)
     {
         var currentUser = await userService.GetCurrentUser();
         var users = await appDbContext.Users
             .Where(x => x.Nickname.Contains(searchRequest) && x.Nickname != currentUser.Nickname)
-            .Select(x => new UserResponse { Id = x.Id, NickName = x.Nickname }).ToListAsync();
+            .Select(x => new UserResponse { Id = x.Id, NickName = x.Nickname }).ToArrayAsync();
         return users;
     }
 }

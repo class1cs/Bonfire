@@ -1,7 +1,7 @@
 ﻿using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Dtos.Response;
 
-namespace Bonfire.Abstractions;
+namespace Bonfire.Application.Interfaces;
 
 public interface IMessagesService
 {

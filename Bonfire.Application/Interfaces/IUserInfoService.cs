@@ -1,10 +1,10 @@
 ﻿using Bonfire.Core.Dtos.Response;
 
-namespace Bonfire.Abstractions;
+namespace Bonfire.Application.Interfaces;
 
 public interface IUserInfoService
 {
     Task<UserResponse> GetCurrentUserInfo();
 
-    Task<List<UserResponse>> SearchUser(string searchRequest);
+    Task<UserResponse[]> SearchUser(string searchRequest);
 }

@@ -1,4 +1,5 @@
 ﻿using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Core.Dtos.Requests;
 using Bonfire.Core.Dtos.Response;
 using Bonfire.Core.Entities;
@@ -27,20 +28,22 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
         var conversationType = receivers.Count > 2 ? ConversationType.Conversation : ConversationType.Dialogue;
 
 
-        var existingChat = await dbContext.Conversations.Include(x => x.Participants)
-            .FirstOrDefaultAsync(p =>
-                p.Participants.All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
+        var existingChat = await dbContext.Conversations
+            .Include(x => x.Participants)
+            .FirstOrDefaultAsync(p => p.Participants
+                .All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
 
-        if (existingChat is not null && conversationType == ConversationType.Dialogue)
+        if (existingChat is not null)
             return new ConversationResponse
             {
                 ConversationType = existingChat.Type,
                 Id = existingChat.Id,
-                Participants = existingChat.Participants.Select(x => new UserResponse
-                {
-                    Id = x.Id,
-                    NickName = x.Nickname
-                }).ToList()
+                Participants = existingChat.Participants
+                    .Select(x => new UserResponse
+                    {
+                        Id = x.Id,
+                        NickName = x.Nickname
+                    }).ToArray()
             };
 
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
@@ -56,17 +59,19 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             {
                 Id = x.Id,
                 NickName = x.Nickname
-            }).ToList()
+            }).ToArray()
         };
     }
 
-    public async Task<List<ConversationResponse>> GetConversations(long offsetMessageId = 0, short limit = 50)
+    public async Task<ConversationResponse[]> GetConversations(long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();
-        var conversations = dbContext.Conversations.AsNoTracking()
+        var conversations = dbContext.Conversations
+            .AsNoTracking()
             .Include(x => x.Participants)
             .Where(x => x.Participants.Any(x => x.Id == currentUser.Id))
-            .Where(b => b.Id > offsetMessageId).OrderByDescending(x => x.Id).Take(limit).ToList();
+            .Where(b => b.Id > offsetMessageId).OrderByDescending(x => x.Id)
+            .Take(limit).ToList();
 
         var conversationResponses = conversations.Select(x => new ConversationResponse
         {
@@ -76,8 +81,8 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             {
                 Id = x.Id,
                 NickName = x.Nickname
-            }).ToList()
-        }).ToList();
+            }).ToArray()
+        }).ToArray();
 
         return conversationResponses;
     }

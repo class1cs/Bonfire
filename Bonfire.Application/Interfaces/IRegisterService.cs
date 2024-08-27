@@ -1,6 +1,6 @@
 ﻿using Bonfire.Core.Dtos.Requests;
 
-namespace Bonfire.Abstractions;
+namespace Bonfire.Application.Interfaces;
 
 public interface IRegisterService
 {

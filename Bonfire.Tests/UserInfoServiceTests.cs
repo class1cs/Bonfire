@@ -83,7 +83,7 @@ public class UserInfoServiceTests
         var result = await userInfoService.SearchUser("test");
 
         // Assert
-        result.Count.Should().Be(1);
+        result.Length.Should().Be(1);
         result[0].NickName.Should().Be("test1");
     }
 
@@ -111,6 +111,6 @@ public class UserInfoServiceTests
         var result = await userInfoService.SearchUser("test");
 
         // Assert
-        result.Count.Should().Be(0);
+        result.Length.Should().Be(0);
     }
 }
