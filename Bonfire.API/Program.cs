@@ -1,4 +1,3 @@
-using Bonfire.Abstractions;
 using Bonfire.API.Middlewares;
 using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
@@ -10,7 +9,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddEndpointsApiExplorer();
@@ -46,8 +44,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionMiddleware>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IRegisterService, RegisterService>();
-builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<IConversationsService, ConversationsService>();
 builder.Services.AddScoped<IMessagesService, MessagesService>();
 builder.Services.AddScoped<IUserInfoService, UserInfoService>();

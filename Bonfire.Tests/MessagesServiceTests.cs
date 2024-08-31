@@ -1,8 +1,8 @@
-﻿using Bonfire.Abstractions;
+﻿using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
-using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Entities;
-using Bonfire.Core.Exceptions;
+using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Entities;
+using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
 using FakeItEasy;
 using FluentAssertions;
@@ -46,7 +46,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.SendMessage(new MessageRequest { Text = "test" }, conversation.Id);
+        var result = await messagesService.SendMessage(new MessageRequestDto ("test"), conversation.Id);
 
         // Assert
         result.Should().NotBeNull();
@@ -81,11 +81,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.SendMessage(new MessageRequest
-                {
-                    Text = string.Empty
-                },
-                conversation.Id);
+            await messagesService.SendMessage(new MessageRequestDto(string.Empty), conversation.Id);
         };
 
         // Assert
@@ -113,11 +109,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.SendMessage(new MessageRequest
-                {
-                    Text = "test"
-                },
-                3);
+            await messagesService.SendMessage(new MessageRequestDto("test"), 3);
         };
 
         // Assert
@@ -149,7 +141,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequest { Text = "test" }, 123, conversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto ("test"), 123, conversation.Id);
         };
 
         // Assert
@@ -213,7 +205,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequest { Text = "test" }, 1, secondConversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto ("test"), 1, secondConversation.Id);
         };
 
         // Assert
@@ -247,7 +239,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequest { Text = "test" }, conversation.Id,
+            await messagesService.EditMessage(new MessageRequestDto ("test"), conversation.Id,
                 messages.FirstOrDefault()!.Id);
         };
         // Assert
@@ -430,7 +422,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.EditMessage(new MessageRequest { Text = "tests" }, 1, conversation.Id);
+        var result = await messagesService.EditMessage(new MessageRequestDto ("tests"), 1, conversation.Id);
 
         // Assert
         result.Should().NotBeNull();
@@ -465,7 +457,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequest { Text = string.Empty }, 1, conversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto (string.Empty), 1, conversation.Id);
         };
 
         // Assert

@@ -1,5 +1,5 @@
 ﻿using Bonfire.Application.Services;
-using Bonfire.Core.Entities;
+using Bonfire.Domain.Entities;
 using Bonfire.Persistance;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;

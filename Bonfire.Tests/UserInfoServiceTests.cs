@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
-using Bonfire.Abstractions;
+using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
-using Bonfire.Core.Entities;
+using Bonfire.Domain.Entities;
 using Bonfire.Persistance;
 using FakeItEasy;
 using FluentAssertions;

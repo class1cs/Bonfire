@@ -2,13 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.API", "Bonfire.API\Bonfire.API.csproj", "{A70806B5-B040-4DFF-9E34-2D9D5631E87F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Core", "Bonfire.Core\Bonfire.Core.csproj", "{18D6CB38-EB33-4731-A7B7-1244F87CE205}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Domain", "Bonfire.Domain\Bonfire.Domain.csproj", "{18D6CB38-EB33-4731-A7B7-1244F87CE205}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Application", "Bonfire.Application\Bonfire.Application.csproj", "{51193834-9ECB-4A12-AF91-2E35803994EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Persistence", "Bonfire.Persistence\Bonfire.Persistence.csproj", "{39F28DE8-4740-4AC8-AD29-40B6371BAF5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonfire.Tests", "Bonfire.Tests\Bonfire.Tests.csproj", "{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{98A23935-9C35-4686-9D46-7BCD0E003CA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DCE8DFD8-B0C2-4F5B-9392-C0ACB2460E0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +40,12 @@ Global
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A70806B5-B040-4DFF-9E34-2D9D5631E87F} = {98A23935-9C35-4686-9D46-7BCD0E003CA0}
+		{51193834-9ECB-4A12-AF91-2E35803994EF} = {98A23935-9C35-4686-9D46-7BCD0E003CA0}
+		{18D6CB38-EB33-4731-A7B7-1244F87CE205} = {98A23935-9C35-4686-9D46-7BCD0E003CA0}
+		{39F28DE8-4740-4AC8-AD29-40B6371BAF5A} = {98A23935-9C35-4686-9D46-7BCD0E003CA0}
+		{42B823CE-E6F1-499C-B5F8-81EE9A88FBA0} = {DCE8DFD8-B0C2-4F5B-9392-C0ACB2460E0E}
 	EndGlobalSection
 EndGlobal

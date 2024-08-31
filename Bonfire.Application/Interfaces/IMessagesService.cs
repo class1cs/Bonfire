@@ -1,15 +1,15 @@
-﻿using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Dtos.Response;
+﻿using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
 
 namespace Bonfire.Application.Interfaces;
 
 public interface IMessagesService
 {
-    Task<MessageResponse> SendMessage(MessageRequest messageRequest, long conversationId);
+    Task<MessageDto> SendMessage(MessageRequestDto messageRequestDto, long conversationId);
 
-    Task<MessageResponse> EditMessage(MessageRequest messageRequest, long messageId, long conversationId);
+    Task<MessageDto> EditMessage(MessageRequestDto messageRequestDto, long messageId, long conversationId);
 
-    Task<MessageResponse> RemoveMessage(long messageId, long conversationId);
+    Task<MessageDto> RemoveMessage(long messageId, long conversationId);
 
-    Task<MessagesResponse> GetMessages(long conversationId, long offsetMessageId = 1, short limit = 50);
+    Task<MessagesDto> GetMessages(long conversationId, long offsetMessageId = 1, short limit = 50);
 }

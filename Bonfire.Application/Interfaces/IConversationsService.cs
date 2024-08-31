@@ -1,10 +1,11 @@
-﻿using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Dtos.Response;
+﻿using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
 
 namespace Bonfire.Application.Interfaces;
 
 public interface IConversationsService
 {
-    Task<ConversationResponse> CreateConversation(ConversationRequest conversationRequest);
-    Task<ConversationResponse[]> GetConversations(long offsetMessageId, short limit);
+    Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto);
+    
+    Task<ConversationDto[]> GetConversations(long offsetMessageId, short limit);
 }

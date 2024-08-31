@@ -1,5 +1,5 @@
-﻿using Bonfire.Abstractions;
-using Bonfire.Core.Entities;
+﻿using Bonfire.Application.Interfaces;
+using Bonfire.Domain.Entities;
 using Bonfire.Persistance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

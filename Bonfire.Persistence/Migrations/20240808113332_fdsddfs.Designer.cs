@@ -24,7 +24,7 @@ namespace Bonfire.Persistance.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Bonfire.Core.Entities.Conversation", b =>
+            modelBuilder.Entity("Bonfire.Domain.Entities.Conversation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -40,7 +40,7 @@ namespace Bonfire.Persistance.Migrations
                     b.ToTable("Conversations");
                 });
 
-            modelBuilder.Entity("Bonfire.Core.Entities.Message", b =>
+            modelBuilder.Entity("Bonfire.Domain.Entities.Message", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -67,7 +67,7 @@ namespace Bonfire.Persistance.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Bonfire.Core.Entities.User", b =>
+            modelBuilder.Entity("Bonfire.Domain.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,15 +103,15 @@ namespace Bonfire.Persistance.Migrations
                     b.ToTable("ConversationUser");
                 });
 
-            modelBuilder.Entity("Bonfire.Core.Entities.Message", b =>
+            modelBuilder.Entity("Bonfire.Domain.Entities.Message", b =>
                 {
-                    b.HasOne("Bonfire.Core.Entities.User", "Author")
+                    b.HasOne("Bonfire.Domain.Entities.User", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Bonfire.Core.Entities.Conversation", "Conversation")
+                    b.HasOne("Bonfire.Domain.Entities.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -124,20 +124,20 @@ namespace Bonfire.Persistance.Migrations
 
             modelBuilder.Entity("ConversationUser", b =>
                 {
-                    b.HasOne("Bonfire.Core.Entities.Conversation", null)
+                    b.HasOne("Bonfire.Domain.Entities.Conversation", null)
                         .WithMany()
                         .HasForeignKey("ConversationsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Bonfire.Core.Entities.User", null)
+                    b.HasOne("Bonfire.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("ParticipantsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bonfire.Core.Entities.Conversation", b =>
+            modelBuilder.Entity("Bonfire.Domain.Entities.Conversation", b =>
                 {
                     b.Navigation("Messages");
                 });

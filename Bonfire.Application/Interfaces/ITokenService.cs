@@ -1,4 +1,4 @@
-﻿using Bonfire.Core.Entities;
+﻿using Bonfire.Domain.Entities;
 
 namespace Bonfire.Application.Interfaces;
 

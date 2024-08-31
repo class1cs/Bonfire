@@ -1,9 +1,8 @@
-﻿using Bonfire.Abstractions;
-using Bonfire.Application.Interfaces;
-using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Dtos.Response;
-using Bonfire.Core.Entities;
-using Bonfire.Core.Exceptions;
+﻿using Bonfire.Application.Interfaces;
+using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
+using Bonfire.Domain.Entities;
+using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +10,7 @@ namespace Bonfire.Application.Services;
 
 public class MessagesService(AppDbContext dbContext, IUserService userService) : IMessagesService
 {
-    public async Task<MessageResponse> SendMessage(MessageRequest messageRequest, long conversationId)
+    public async Task<MessageDto> SendMessage(MessageRequestDto messageRequestDto, long conversationId)
     {
         var currentUser = await userService.GetCurrentUser();
         var conversation = await dbContext.Conversations.Include(x => x.Messages)
@@ -21,27 +20,27 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
 
         if (conversation.Participants.All(x => x.Id != currentUser.Id)) throw new AccessToConversationDeniedException();
 
-        if (string.IsNullOrWhiteSpace(messageRequest.Text)) throw new EmptyMessageTextException();
+        if (string.IsNullOrWhiteSpace(messageRequestDto.Text)) throw new EmptyMessageTextException();
 
-        var message = new Message(messageRequest.Text, currentUser);
+        var message = new Message(messageRequestDto.Text, currentUser);
 
         conversation.Messages.Add(message);
         await dbContext.SaveChangesAsync();
 
-        return new MessageResponse
-        {
-            Id = message.Id,
-            Author = new UserResponse
-            {
-                Id = message.Author.Id,
-                NickName = message.Author.Nickname
-            },
-            Text = message.Text,
-            SentTime = message.SentTime
-        };
+        return new MessageDto
+        (
+            message.Id,
+            new UserDto 
+            (
+                message.Author.Id, 
+                message.Author.Nickname
+            ),
+            message.Text,
+            message.SentTime
+        );
     }
 
-    public async Task<MessageResponse> EditMessage(MessageRequest messageRequest, long messageId, long conversationId)
+    public async Task<MessageDto> EditMessage(MessageRequestDto messageRequestDto, long messageId, long conversationId)
     {
         var currentUser = await userService.GetCurrentUser();
 
@@ -49,58 +48,65 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         var message = await dbContext.Messages.Include(message => message.Author)
             .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
 
-        if (conversation is null) throw new ConversationNotFoundException();
+        if (conversation is null) 
+            throw new ConversationNotFoundException();
 
-        if (message is null) throw new MessageNotFoundException();
+        if (message is null) 
+            throw new MessageNotFoundException();
 
-        if (message?.Author?.Id != currentUser?.Id) throw new AccessToMessageDeniedException();
+        if (message.Author.Id != currentUser?.Id)
+            throw new AccessToMessageDeniedException();
 
-        if (string.IsNullOrWhiteSpace(messageRequest.Text)) throw new EmptyMessageTextException();
-
-        message.Text = messageRequest.Text;
+        if (string.IsNullOrWhiteSpace(messageRequestDto.Text))
+            throw new EmptyMessageTextException();
+            
+        message.Text = messageRequestDto.Text;
         await dbContext.SaveChangesAsync();
 
-        return new MessageResponse
-        {
-            Id = message.Id,
-            Author = new UserResponse
-            {
-                Id = message.Author.Id,
-                NickName = message.Author.Nickname
-            },
-            Text = message.Text,
-            SentTime = message.SentTime
-        };
+        return new MessageDto
+        (
+            message.Id,
+            new UserDto 
+            (
+                message.Author.Id,
+                message.Author.Nickname
+            ),
+            message.Text,
+            message.SentTime
+        );
     }
 
-    public async Task<MessageResponse> RemoveMessage(long messageId, long conversationId)
+    public async Task<MessageDto> RemoveMessage(long messageId, long conversationId)
     {
         var currentUser = await userService.GetCurrentUser();
 
-        var message = await dbContext.Messages.Include(message => message.Author)
+        var message = await dbContext.Messages
+            .Include(message => message.Author)
             .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
 
-        if (message == null) throw new MessageNotFoundException();
+        if (message == null) 
+            throw new MessageNotFoundException();
 
-        if (message.Author.Id != currentUser.Id) throw new AccessToMessageDeniedException();
+        if (message.Author.Id != currentUser.Id) 
+            throw new AccessToMessageDeniedException();
 
         dbContext.Messages.Remove(message);
         await dbContext.SaveChangesAsync();
 
-        return new MessageResponse
-        {
-            Id = message.Id,
-            Author = new UserResponse
-            {
-                Id = message.Author.Id,
-                NickName = message.Author.Nickname
-            },
-            Text = message.Text,
-            SentTime = message.SentTime
-        };
+        return new MessageDto
+        (
+            message.Id,
+            new UserDto 
+            (
+                message.Author.Id,
+                message.Author.Nickname
+            ),
+            message.Text,
+            message.SentTime
+        );
     }
 
-    public async Task<MessagesResponse> GetMessages(long conversationId, long offsetMessageId = 0, short limit = 50)
+    public async Task<MessagesDto> GetMessages(long conversationId, long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();
 
@@ -109,27 +115,27 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             .ThenInclude(message => message.Author)
             .Include(x => x.Participants).AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Id == conversationId);
+        
         var messagesResponses = conversation?.Messages
-            .Select(x => new MessageResponse
-            {
-                Id = x.Id, Text = x.Text,
-                Author = new UserResponse
-                {
-                    Id = x.Author.Id,
-                    NickName = x.Author.Nickname
-                },
-                SentTime = x.SentTime
-            })
-            .ToArray();
+            .Select(x =>
+                new MessageDto
+                (
+                    x.Id, 
+                    new UserDto(x.Author.Id, x.Author.Nickname),
+                    x.Text,
+                    x.SentTime
+                )).ToArray();
 
-        if (conversation == null) throw new ConversationNotFoundException();
+        if (conversation == null) 
+            throw new ConversationNotFoundException();
 
-        if (conversation.Participants.All(x => x.Id != currentUser.Id)) throw new AccessToConversationDeniedException();
+        if (conversation.Participants.All(x => x.Id != currentUser.Id)) 
+            throw new AccessToConversationDeniedException();
 
-        return new MessagesResponse
-        {
-            Id = conversation.Id,
-            Messages = messagesResponses!
-        };
+        return new MessagesDto
+        (
+            conversation.Id,
+            messagesResponses!
+        );
     }
 }

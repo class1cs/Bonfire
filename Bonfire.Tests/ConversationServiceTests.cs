@@ -1,8 +1,8 @@
-﻿using Bonfire.Abstractions;
+﻿using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
-using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Entities;
-using Bonfire.Core.Exceptions;
+using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Entities;
+using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
 using FakeItEasy;
 using FluentAssertions;
@@ -44,11 +44,11 @@ public class ConversationsServiceTests
         var participants = new List<long> { user1.Id };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequest { UsersIds = participants });
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants));
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(1);
+        result.ConversationId.Should().Be(1);
         result.Participants.Length.Should().Be(2);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
     }
@@ -76,11 +76,11 @@ public class ConversationsServiceTests
         var participants = new List<long> { user1.Id, user2.Id, user3.Id };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequest { UsersIds = participants });
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants));
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(1);
+        result.ConversationId.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Conversation);
         result.Participants.Length.Should().Be(4);
     }
@@ -110,12 +110,11 @@ public class ConversationsServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result =
-            await conversationsService.CreateConversation(new ConversationRequest { UsersIds = participantsIds });
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(1);
+        result.ConversationId.Should().Be(1);
         result.ConversationType.Should().Be(ConversationType.Dialogue);
         result.Participants.Length.Should().NotBe(0);
     }
@@ -147,8 +146,7 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequest
-                { UsersIds = participantsIds });
+            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
         };
 
         // Assert
@@ -214,8 +212,7 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequest
-                { UsersIds = participantsIds });
+            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
         };
 
         // Assert

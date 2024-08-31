@@ -1,4 +1,4 @@
-﻿using Bonfire.Core.Exceptions;
+﻿using Bonfire.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 

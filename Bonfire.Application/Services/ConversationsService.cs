@@ -1,9 +1,8 @@
-﻿using Bonfire.Abstractions;
-using Bonfire.Application.Interfaces;
-using Bonfire.Core.Dtos.Requests;
-using Bonfire.Core.Dtos.Response;
-using Bonfire.Core.Entities;
-using Bonfire.Core.Exceptions;
+﻿using Bonfire.Application.Interfaces;
+using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
+using Bonfire.Domain.Entities;
+using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +10,13 @@ namespace Bonfire.Application.Services;
 
 public class ConversationsService(AppDbContext dbContext, IUserService userService) : IConversationsService
 {
-    public async Task<ConversationResponse> CreateConversation(ConversationRequest conversationRequest)
+    public async Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto)
     {
         var currentUser = await userService.GetCurrentUser();
 
-        var receivers = await dbContext.Users.Where(u => conversationRequest.UsersIds.Contains(u.Id)).ToListAsync();
+        var receivers = await dbContext.Users.Where(u => conversationRequestDto.UsersIds.Contains(u.Id)).ToListAsync();
 
-        if (receivers.Count != conversationRequest.UsersIds.Count)
+        if (receivers.Count != conversationRequestDto.UsersIds.Count)
             throw new WrongConversationParticipantsIdsException();
 
         if (receivers.Contains(currentUser)) throw new ReceiverEqualsSenderException();
@@ -34,36 +33,32 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
                 .All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
 
         if (existingChat is not null)
-            return new ConversationResponse
-            {
-                ConversationType = existingChat.Type,
-                Id = existingChat.Id,
-                Participants = existingChat.Participants
-                    .Select(x => new UserResponse
-                    {
-                        Id = x.Id,
-                        NickName = x.Nickname
-                    }).ToArray()
-            };
+            return new ConversationDto
+            (
+                existingChat.Id, 
+                existingChat.Participants.Select(x => new UserDto
+                (
+                    x.Id, x.Nickname
+                )).ToArray(), existingChat.Type
+            );
+           
 
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
 
         await dbContext.Conversations.AddAsync(conversation);
         await dbContext.SaveChangesAsync();
 
-        return new ConversationResponse
-        {
-            ConversationType = conversation.Type,
-            Id = conversation.Id,
-            Participants = conversation.Participants.Select(x => new UserResponse
-            {
-                Id = x.Id,
-                NickName = x.Nickname
-            }).ToArray()
-        };
+        return new ConversationDto
+        (
+            conversation.Id, 
+            conversation.Participants.Select(x => new UserDto
+            (
+                x.Id, x.Nickname
+            )).ToArray(), conversation.Type
+        );
     }
 
-    public async Task<ConversationResponse[]> GetConversations(long offsetMessageId = 0, short limit = 50)
+    public async Task<ConversationDto[]> GetConversations(long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();
         var conversations = dbContext.Conversations
@@ -73,16 +68,17 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             .Where(b => b.Id > offsetMessageId).OrderByDescending(x => x.Id)
             .Take(limit).ToList();
 
-        var conversationResponses = conversations.Select(x => new ConversationResponse
-        {
-            ConversationType = x.Type,
-            Id = x.Id,
-            Participants = x.Participants.Select(x => new UserResponse
-            {
-                Id = x.Id,
-                NickName = x.Nickname
-            }).ToArray()
-        }).ToArray();
+        var conversationResponses = conversations.Select(x => new ConversationDto
+        (
+            x.Id,
+            x.Participants.Select(x => new UserDto
+            (
+                x.Id,
+                x.Nickname
+            )).ToArray(),
+            x.Type
+        )
+        ).ToArray();
 
         return conversationResponses;
     }
