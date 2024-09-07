@@ -14,12 +14,15 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
     {
         var currentUser = await userService.GetCurrentUser();
 
-        var receivers = await dbContext.Users.Where(u => conversationRequestDto.UsersIds.Contains(u.Id)).ToListAsync();
+        var receivers = await dbContext.Users
+            .Where(u => conversationRequestDto.UsersIds.Contains(u.Id))
+            .ToListAsync();
 
         if (receivers.Count != conversationRequestDto.UsersIds.Count)
             throw new WrongConversationParticipantsIdsException();
 
-        if (receivers.Contains(currentUser)) throw new ReceiverEqualsSenderException();
+        if (receivers.Contains(currentUser)) 
+            throw new ReceiverEqualsSenderException();
 
         receivers.Add(currentUser);
 

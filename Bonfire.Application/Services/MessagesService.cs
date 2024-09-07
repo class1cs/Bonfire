@@ -24,7 +24,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
 
         var message = new Message(messageRequestDto.Text, currentUser);
 
-        conversation.Messages.Add(message);
+        conversation!.Messages.Add(message);
         await dbContext.SaveChangesAsync();
 
         return new MessageDto
