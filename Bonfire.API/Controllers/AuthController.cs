@@ -15,16 +15,16 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequestDto registerRequestDto)
+    public async Task<IActionResult> Register(RegisterRequestDto registerRequestDto, CancellationToken cancellationToken)
     {
-        var responseDto = await _identityService.Register(registerRequestDto);
+        var responseDto = await _identityService.Register(registerRequestDto, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequestDto loginRequestDto)
+    public async Task<IActionResult> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
     {
-        var responseDto = await _identityService.Login(loginRequestDto);
+        var responseDto = await _identityService.Login(loginRequestDto, cancellationToken);
         return Ok(responseDto);
     }
 }

@@ -12,9 +12,9 @@ namespace Bonfire.Application.Services;
 
 public class IdentityService(ITokenService tokenService, AppDbContext appDbContext) : IIdentityService
 {
-    public async Task<string> Login(LoginRequestDto loginRequestDto)
+    public async Task<string> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
     {
-        var authorizedUser = await VerifyLoginCredentials(loginRequestDto.NickName, loginRequestDto.Password);
+        var authorizedUser = await VerifyLoginCredentials(loginRequestDto.NickName, loginRequestDto.Password, cancellationToken);
         if (authorizedUser is null)
         {
             throw new InvalidLoginCredentialsException();
@@ -24,7 +24,7 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         return token;
     }
 
-    public async Task<string> Register(RegisterRequestDto registerUser)
+    public async Task<string> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(registerUser.NickName) || string.IsNullOrWhiteSpace(registerUser.Password))
         {
@@ -32,7 +32,7 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         }
             
 
-        if (await CheckUserExists(registerUser.NickName))
+        if (await CheckUserExists(registerUser.NickName, cancellationToken))
         {
             throw new NicknameAlreadyExistsException();
         }
@@ -46,16 +46,16 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         return tokenService.GenerateToken(userToAdd);
     }
 
-    public async Task<bool> CheckUserExists(string login)
+    public async Task<bool> CheckUserExists(string login, CancellationToken cancellationToken)
     {
-        var isUserExists = await appDbContext.Users.AsNoTracking().AnyAsync(x => x.Nickname == login);
+        var isUserExists = await appDbContext.Users.AsNoTracking().AnyAsync(x => x.Nickname == login, cancellationToken);
         return isUserExists;
     }
     
-    public async Task<User?> VerifyLoginCredentials(string nickName, string password)
+    public async Task<User?> VerifyLoginCredentials(string nickName, string password, CancellationToken cancellationToken)
     {
         var user = await appDbContext.Users.AsNoTracking().FirstOrDefaultAsync(x =>
-            x.Nickname == nickName);
+            x.Nickname == nickName, cancellationToken);
         if (user is null)
         {
             throw new InvalidLoginCredentialsException();

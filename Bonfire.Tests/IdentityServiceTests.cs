@@ -32,10 +32,10 @@ public class IdentityServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await loginService.VerifyLoginCredentials(user.Nickname, "test");
+        var result = await loginService.VerifyLoginCredentials(user.Nickname, "test", default);
 
         // Assert
-        result.Id.Should().Be(user.Id);
+        result!.Id.Should().Be(user.Id);
     }
 
     [Fact(DisplayName = "После успешного входа должен возвращаться токен авторизации.")]
@@ -56,7 +56,7 @@ public class IdentityServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await loginService.Login(new LoginRequestDto(user.Nickname, "test"));
+        var result = await loginService.Login(new LoginRequestDto(user.Nickname, "test"), default);
 
         // Assert
         result.Should().Be("Token");
@@ -73,14 +73,13 @@ public class IdentityServiceTests
 
         var user = CreateUser();
 
-
         var tokenService = A.Fake<ITokenService>();
         A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
         var loginService = new IdentityService(tokenService, context);
 
         await context.AddAsync(user);
         await context.SaveChangesAsync();
-
+        
         // Act
         var result = async () =>
         {
@@ -88,7 +87,7 @@ public class IdentityServiceTests
             (
                 string.Empty,
                 string.Empty
-            ));
+            ), default);
         };
 
         // Assert
@@ -115,7 +114,6 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var user = CreateUser();
-        
         var request = new RegisterRequestDto(user.Nickname, "test");
         var passwordHasherService = A.Fake<IPasswordHasherService>();
         
@@ -128,7 +126,7 @@ public class IdentityServiceTests
         var identityService = new IdentityService(tokenService, context);
 
         // Act
-        var result = await identityService.Register(request);
+        var result = await identityService.Register(request, default);
 
         // Assert
         result.Should().Be("Token");
@@ -141,7 +139,6 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        
         var user = CreateUser();
         var request = new RegisterRequestDto(user.Nickname, "test");
         
@@ -154,7 +151,7 @@ public class IdentityServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await identityService.Register(request); };
+        var result = async () => { await identityService.Register(request, default); };
 
         // Assert
         await result.Should().ThrowAsync<NicknameAlreadyExistsException>();
@@ -174,7 +171,7 @@ public class IdentityServiceTests
         var identityService = new IdentityService(tokenService, context);
 
         // Act
-        var result = async () => { await identityService.Register(request); };
+        var result = async () => { await identityService.Register(request, default); };
 
         // Assert
         await result.Should().ThrowAsync<InvalidRegistrationDataException>();
@@ -187,7 +184,6 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var user = CreateUser();
-        
         var tokenService = A.Fake<ITokenService>();
         A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
         var context = new AppDbContext(options);
@@ -197,7 +193,7 @@ public class IdentityServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await identityService.CheckUserExists(user.Nickname);
+        var result = await identityService.CheckUserExists(user.Nickname, default);
 
 
         // Assert
@@ -212,7 +208,6 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var user = CreateUser();
-        var request = new RegisterRequestDto(user.Nickname, "test");
         var passwordHasherService = A.Fake<IPasswordHasherService>();
         A.CallTo(() => passwordHasherService.HashPassword("test")).WithAnyArguments()
             .Returns("$2a$11$h7D6B.QDKZCSzlHfXa.hpO7bB9ySYwkRdI6VQTxl4sp0K/b6F61Fq");
@@ -222,7 +217,7 @@ public class IdentityServiceTests
         var identityService = new IdentityService(tokenService, context);
 
         // Act
-        var result = await identityService.CheckUserExists(user.Nickname);
+        var result = await identityService.CheckUserExists(user.Nickname, default);
 
         // Assert
         result.Should().BeFalse();

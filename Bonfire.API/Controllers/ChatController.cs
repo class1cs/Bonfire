@@ -20,45 +20,45 @@ public class ChatController : ControllerBase
     }
     
     [HttpPost("{conversationId:long}/messages")]
-    public async Task<IActionResult> SendMessage(long conversationId, [FromBody] MessageRequestDto messageRequestDto)
+    public async Task<IActionResult> SendMessage(long conversationId, [FromBody] MessageRequestDto messageRequestDto, CancellationToken cancellationToken)
     {
-        var responseDto = await _messagesService.SendMessage(messageRequestDto, conversationId);
+        var responseDto = await _messagesService.SendMessage(messageRequestDto, conversationId, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpGet("{conversationId:long}/messages")]
-    public async Task<IActionResult> GetMessages(long conversationId, short limit = 50, long offsetMessageId = 0)
+    public async Task<IActionResult> GetMessages(CancellationToken cancellationToken, long conversationId, short limit = 50, long offsetMessageId = 0)
     {
-        var responseDto = await _messagesService.GetMessages(conversationId, offsetMessageId, limit);
+        var responseDto = await _messagesService.GetMessages(cancellationToken, conversationId, offsetMessageId, limit);
         return Ok(responseDto);
     }
 
     [HttpPut("{conversationId:long}/messages/{messageId:long}")]
     public async Task<IActionResult> EditMessage(long messageId, long conversationId,
-        [FromBody] MessageRequestDto messageRequestDto)
+        [FromBody] MessageRequestDto messageRequestDto, CancellationToken cancellationToken)
     {
-        var responseDto = await _messagesService.EditMessage(messageRequestDto, messageId, conversationId);
+        var responseDto = await _messagesService.EditMessage(messageRequestDto, messageId, conversationId, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpDelete("{conversationId:long}/messages/{messageId:long}")]
-    public async Task<IActionResult> RemoveMessage(long messageId, long conversationId)
+    public async Task<IActionResult> RemoveMessage(long messageId, long conversationId, CancellationToken cancellationToken)
     {
-        var responseDto = await _messagesService.RemoveMessage(messageId, conversationId);
+        var responseDto = await _messagesService.RemoveMessage(messageId, conversationId, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateConversation([FromBody] ConversationRequestDto conversationRequestDto)
+    public async Task<IActionResult> CreateConversation([FromBody] ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken)
     {
-        var responseDto = await _conversationsService.CreateConversation(conversationRequestDto);
+        var responseDto = await _conversationsService.CreateConversation(conversationRequestDto, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetConversations(short limit = 50, long offsetConversationId = 0)
+    public async Task<IActionResult> GetConversations(CancellationToken cancellationToken, short limit = 50, long offsetConversationId = 0)
     {
-        var responseDto = await _conversationsService.GetConversations(offsetConversationId, limit);
+        var responseDto = await _conversationsService.GetConversations(cancellationToken, offsetConversationId, limit);
         return Ok(responseDto);
     }
 }

@@ -46,7 +46,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.SendMessage(new MessageRequestDto ("test"), conversation.Id);
+        var result = await messagesService.SendMessage(new MessageRequestDto ("test"), conversation.Id, default);
 
         // Assert
         result.Should().NotBeNull();
@@ -81,7 +81,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.SendMessage(new MessageRequestDto(string.Empty), conversation.Id);
+            await messagesService.SendMessage(new MessageRequestDto(string.Empty), conversation.Id, default);
         };
 
         // Assert
@@ -109,7 +109,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.SendMessage(new MessageRequestDto("test"), 3);
+            await messagesService.SendMessage(new MessageRequestDto("test"), 3, default);
         };
 
         // Assert
@@ -141,7 +141,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequestDto ("test"), 123, conversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto ("test"), 123, conversation.Id, default);
         };
 
         // Assert
@@ -172,7 +172,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.GetMessages(conversation.Id);
+        var result = await messagesService.GetMessages(default, conversation.Id);
 
         // Assert
         result.Messages.Length.Should().Be(1);
@@ -205,7 +205,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequestDto ("test"), 1, secondConversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto ("test"), 1, secondConversation.Id, default);
         };
 
         // Assert
@@ -240,7 +240,7 @@ public class MessagesServiceTests
         var result = async () =>
         {
             await messagesService.EditMessage(new MessageRequestDto ("test"), conversation.Id,
-                messages.FirstOrDefault()!.Id);
+                messages.FirstOrDefault()!.Id, default);
         };
         // Assert
         await result.Should().ThrowAsync<AccessToMessageDeniedException>();
@@ -269,7 +269,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.RemoveMessage(123, conversation.Id); };
+        var result = async () => { await messagesService.RemoveMessage(123, conversation.Id, default); };
         // Assert
         await result.Should().ThrowAsync<MessageNotFoundException>();
     }
@@ -298,7 +298,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.RemoveMessage(1, secondConversation.Id); };
+        var result = async () => { await messagesService.RemoveMessage(1, secondConversation.Id, default); };
 
         // Assert
         await result.Should().ThrowAsync<MessageNotFoundException>();
@@ -330,7 +330,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.RemoveMessage(1, conversation.Id); };
+        var result = async () => { await messagesService.RemoveMessage(1, conversation.Id, default); };
 
         // Assert
         await result.Should().ThrowAsync<AccessToMessageDeniedException>();
@@ -361,7 +361,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.GetMessages(conversation.Id); };
+        var result = async () => { await messagesService.GetMessages(default, conversation.Id); };
 
         // Assert
         await result.Should().ThrowAsync<AccessToConversationDeniedException>();
@@ -393,7 +393,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = async () => { await messagesService.GetMessages(conversation.Id); };
+        var result = async () => { await messagesService.GetMessages(default, conversation.Id); };
 
         // Assert
         await result.Should().ThrowAsync<AccessToConversationDeniedException>();
@@ -422,7 +422,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.EditMessage(new MessageRequestDto ("tests"), 1, conversation.Id);
+        var result = await messagesService.EditMessage(new MessageRequestDto ("tests"), 1, conversation.Id, default);
 
         // Assert
         result.Should().NotBeNull();
@@ -457,7 +457,7 @@ public class MessagesServiceTests
         // Act
         var result = async () =>
         {
-            await messagesService.EditMessage(new MessageRequestDto (string.Empty), 1, conversation.Id);
+            await messagesService.EditMessage(new MessageRequestDto (string.Empty), 1, conversation.Id, default);
         };
 
         // Assert
@@ -487,7 +487,7 @@ public class MessagesServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await messagesService.RemoveMessage(conversation.Id, 1);
+        var result = await messagesService.RemoveMessage(conversation.Id, 1, default);
 
         // Assert
         result.Should().NotBeNull();

@@ -10,11 +10,11 @@ namespace Bonfire.Application.Services;
 
 public class MessagesService(AppDbContext dbContext, IUserService userService) : IMessagesService
 {
-    public async Task<MessageDto> SendMessage(MessageRequestDto messageRequestDto, long conversationId)
+    public async Task<MessageDto> SendMessage(MessageRequestDto messageRequestDto, long conversationId, CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser();
         var conversation = await dbContext.Conversations.Include(x => x.Messages)
-            .Include(conversation => conversation.Participants).FirstOrDefaultAsync(x => x.Id == conversationId);
+            .Include(conversation => conversation.Participants).FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken: cancellationToken);
 
         if (conversation == null) throw new ConversationNotFoundException();
 
@@ -25,12 +25,12 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         var message = new Message(messageRequestDto.Text, currentUser);
 
         conversation!.Messages.Add(message);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new MessageDto
         (
             message.Id,
-            new UserDto 
+            new UserDto
             (
                 message.Author.Id, 
                 message.Author.Nickname
@@ -40,13 +40,13 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         );
     }
 
-    public async Task<MessageDto> EditMessage(MessageRequestDto messageRequestDto, long messageId, long conversationId)
+    public async Task<MessageDto> EditMessage(MessageRequestDto messageRequestDto, long messageId, long conversationId, CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser();
 
-        var conversation = await dbContext.Conversations.FirstOrDefaultAsync(x => x.Id == conversationId);
+        var conversation = await dbContext.Conversations.FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken: cancellationToken);
         var message = await dbContext.Messages.Include(message => message.Author)
-            .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
+            .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId, cancellationToken: cancellationToken);
 
         if (conversation is null) 
             throw new ConversationNotFoundException();
@@ -61,7 +61,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             throw new EmptyMessageTextException();
             
         message.Text = messageRequestDto.Text;
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new MessageDto
         (
@@ -76,13 +76,13 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         );
     }
 
-    public async Task<MessageDto> RemoveMessage(long messageId, long conversationId)
+    public async Task<MessageDto> RemoveMessage(long messageId, long conversationId, CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser();
 
         var message = await dbContext.Messages
             .Include(message => message.Author)
-            .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId);
+            .FirstOrDefaultAsync(x => x.Id == messageId && x.ConversationId == conversationId, cancellationToken: cancellationToken);
 
         if (message == null) 
             throw new MessageNotFoundException();
@@ -91,7 +91,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             throw new AccessToMessageDeniedException();
 
         dbContext.Messages.Remove(message);
-        await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return new MessageDto
         (
@@ -106,7 +106,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
         );
     }
 
-    public async Task<MessagesDto> GetMessages(long conversationId, long offsetMessageId = 0, short limit = 50)
+    public async Task<MessagesDto> GetMessages(CancellationToken cancellationToken, long conversationId, long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();
 
@@ -114,7 +114,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
             .Include(x => x.Messages.Where(b => b.Id > offsetMessageId).Take(limit))
             .ThenInclude(message => message.Author)
             .Include(x => x.Participants).AsSplitQuery()
-            .FirstOrDefaultAsync(x => x.Id == conversationId);
+            .FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken: cancellationToken);
         
         var messagesResponses = conversation?.Messages
             .Select(x =>

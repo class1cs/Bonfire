@@ -44,7 +44,7 @@ public class ConversationsServiceTests
         var participants = new List<long> { user1.Id };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants));
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants), default);
 
         // Assert
         result.Should().NotBeNull();
@@ -76,7 +76,7 @@ public class ConversationsServiceTests
         var participants = new List<long> { user1.Id, user2.Id, user3.Id };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants));
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants), default);
 
         // Assert
         result.Should().NotBeNull();
@@ -110,7 +110,7 @@ public class ConversationsServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
+        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
 
         // Assert
         result.Should().NotBeNull();
@@ -146,7 +146,7 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
+            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
         };
 
         // Assert
@@ -178,7 +178,7 @@ public class ConversationsServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await conversationsService.GetConversations();
+        var result = await conversationsService.GetConversations(default);
 
         // Assert
         result.Length.Should().NotBe(0);
@@ -212,7 +212,7 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds));
+            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
         };
 
         // Assert

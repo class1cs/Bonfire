@@ -10,13 +10,13 @@ namespace Bonfire.Application.Services;
 
 public class ConversationsService(AppDbContext dbContext, IUserService userService) : IConversationsService
 {
-    public async Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto)
+    public async Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser();
 
         var receivers = await dbContext.Users
             .Where(u => conversationRequestDto.UsersIds.Contains(u.Id))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         if (receivers.Count != conversationRequestDto.UsersIds.Count)
             throw new WrongConversationParticipantsIdsException();
@@ -33,9 +33,10 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
         var existingChat = await dbContext.Conversations
             .Include(x => x.Participants)
             .FirstOrDefaultAsync(p => p.Participants
-                .All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue));
+                .All(c => receivers.Contains(c) && p.Type == ConversationType.Dialogue), cancellationToken);
 
         if (existingChat is not null)
+        {
             return new ConversationDto
             (
                 existingChat.Id, 
@@ -44,14 +45,16 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
                     x.Id, x.Nickname
                 )).ToArray(), existingChat.Type
             );
+        }
+            
            
 
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
 
-        await dbContext.Conversations.AddAsync(conversation);
-        await dbContext.SaveChangesAsync();
+        await dbContext.Conversations.AddAsync(conversation, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new ConversationDto
+        return new ConversationDto  
         (
             conversation.Id, 
             conversation.Participants.Select(x => new UserDto
@@ -60,28 +63,28 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             )).ToArray(), conversation.Type
         );
     }
+    
 
-    public async Task<ConversationDto[]> GetConversations(long offsetMessageId = 0, short limit = 50)
+    public async Task<ConversationDto[]> GetConversations(CancellationToken cancellationToken, long offsetMessageId = 0, short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser();
-        var conversations = dbContext.Conversations
+        var conversations = await dbContext.Conversations
             .AsNoTracking()
             .Include(x => x.Participants)
             .Where(x => x.Participants.Any(x => x.Id == currentUser.Id))
             .Where(b => b.Id > offsetMessageId).OrderByDescending(x => x.Id)
-            .Take(limit).ToList();
+            .Take(limit).ToArrayAsync(cancellationToken);
 
         var conversationResponses = conversations.Select(x => new ConversationDto
         (
             x.Id,
-            x.Participants.Select(x => new UserDto
+            x.Participants.Select(user => new UserDto
             (
-                x.Id,
-                x.Nickname
+                user.Id,
+                user.Nickname
             )).ToArray(),
             x.Type
-        )
-        ).ToArray();
+        )).ToArray();
 
         return conversationResponses;
     }
