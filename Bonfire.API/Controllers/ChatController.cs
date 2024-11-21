@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Controllers;
 
-[Route("api/[controller]/conversations/")]
 [ApiController]
 [Authorize]
 public class ChatController : ControllerBase
@@ -19,21 +18,21 @@ public class ChatController : ControllerBase
         _conversationsService = conversationsService;
     }
     
-    [HttpPost("{conversationId:long}/messages")]
+    [HttpPost(Routes.Chat.SendMessage)]
     public async Task<IActionResult> SendMessage(long conversationId, [FromBody] MessageRequestDto messageRequestDto, CancellationToken cancellationToken)
     {
         var responseDto = await _messagesService.SendMessage(messageRequestDto, conversationId, cancellationToken);
         return Ok(responseDto);
     }
 
-    [HttpGet("{conversationId:long}/messages")]
+    [HttpGet(Routes.Chat.GetMessages)]
     public async Task<IActionResult> GetMessages(CancellationToken cancellationToken, long conversationId, short limit = 50, long offsetMessageId = 0)
     {
         var responseDto = await _messagesService.GetMessages(cancellationToken, conversationId, offsetMessageId, limit);
         return Ok(responseDto);
     }
 
-    [HttpPut("{conversationId:long}/messages/{messageId:long}")]
+    [HttpPut(Routes.Chat.EditMessage)]
     public async Task<IActionResult> EditMessage(long messageId, long conversationId,
         [FromBody] MessageRequestDto messageRequestDto, CancellationToken cancellationToken)
     {
@@ -41,21 +40,21 @@ public class ChatController : ControllerBase
         return Ok(responseDto);
     }
 
-    [HttpDelete("{conversationId:long}/messages/{messageId:long}")]
+    [HttpDelete(Routes.Chat.RemoveMessage)]
     public async Task<IActionResult> RemoveMessage(long messageId, long conversationId, CancellationToken cancellationToken)
     {
         var responseDto = await _messagesService.RemoveMessage(messageId, conversationId, cancellationToken);
         return Ok(responseDto);
     }
 
-    [HttpPost]
+    [HttpPost(Routes.Chat.CreateConversation)]
     public async Task<IActionResult> CreateConversation([FromBody] ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken)
     {
         var responseDto = await _conversationsService.CreateConversation(conversationRequestDto, cancellationToken);
         return Ok(responseDto);
     }
 
-    [HttpGet]
+    [HttpGet(Routes.Chat.GetConversations)]
     public async Task<IActionResult> GetConversations(CancellationToken cancellationToken, short limit = 50, long offsetConversationId = 0)
     {
         var responseDto = await _conversationsService.GetConversations(cancellationToken, offsetConversationId, limit);

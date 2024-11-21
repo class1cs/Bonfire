@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Controllers;
 
-[Route("api/[controller]")]
 [Authorize]
 [ApiController]
 public class UsersController : ControllerBase
@@ -16,14 +15,14 @@ public class UsersController : ControllerBase
         _userInfoService = userInfoService;
     }
     
-    [HttpGet("{searchRequest}")]
+    [HttpGet(Routes.Users.SearchUsers)]
     public async Task<IActionResult> SearchUsers(string searchRequest)
     {
         var responseDto = await _userInfoService.SearchUser(searchRequest);
         return Ok(responseDto);
     }
 
-    [HttpGet]
+    [HttpGet(Routes.Users.GetCurrentUserInfo)]
     public async Task<IActionResult> GetCurrentUserInfo()
     {
         var responseDto = await _userInfoService.GetCurrentUserInfo();

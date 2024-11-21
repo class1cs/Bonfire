@@ -11,7 +11,8 @@ public class ExceptionMiddleware : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is not BaseException baseException) return false;
+        if (exception is not BaseException baseException) 
+            return false;
 
         var problemDetails = new ProblemDetails
         {

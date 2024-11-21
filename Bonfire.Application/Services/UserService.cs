@@ -14,7 +14,7 @@ public class UserService(IHttpContextAccessor httpContextAccessor, AppDbContext 
             httpContextAccessor.HttpContext!.User.Claims.FirstOrDefault(x => x.Type == "Id")!.Value;
         var currentUserIdLong = Convert.ToInt64(currentUserIdString);
         var currentUser = await appDbContext.Users.Include(x => x.Conversations)
-            .FirstOrDefaultAsync(x => x.Id == currentUserIdLong);
+            .FirstAsync(x => x.Id == currentUserIdLong);
         return currentUser!;
     }
 }

@@ -7,5 +7,5 @@ public interface IConversationsService
 {
     Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken);
     
-    Task<ConversationDto[]> GetConversations(CancellationToken cancellationToken, long offsetMessageId, short limit);
+    Task<ConversationDto[]> GetConversations(CancellationToken cancellationToken, long offsetMessageId = 0, short limit = 50);
 }

@@ -2,7 +2,7 @@
 
 public static class HttpErrors
 {
-    public const string ConversationNotFoundException = "";
+    public const string ConversationNotFoundException = "Этой переписки, к сожалению, не существует.";
 
     public const string AccessToMessageDenied = "Эй! У тебя нет доступа к этому сообщению!";
 

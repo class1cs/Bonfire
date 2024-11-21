@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Controllers;
 
-[Route("api/[controller]")]
+
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -14,14 +14,14 @@ public class AuthController : ControllerBase
         _identityService = identityService;
     }
     
-    [HttpPost("register")]
+    [HttpPost(Routes.Auth.Register)]
     public async Task<IActionResult> Register(RegisterRequestDto registerRequestDto, CancellationToken cancellationToken)
     {
         var responseDto = await _identityService.Register(registerRequestDto, cancellationToken);
         return Ok(responseDto);
     }
 
-    [HttpPost("login")]
+    [HttpPost(Routes.Auth.Login)]
     public async Task<IActionResult> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
     {
         var responseDto = await _identityService.Login(loginRequestDto, cancellationToken);

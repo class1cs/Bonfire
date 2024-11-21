@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
 
-
-
 public class IdentityService(ITokenService tokenService, AppDbContext appDbContext) : IIdentityService
 {
     public async Task<string> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
@@ -41,8 +39,8 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         var passwordHash = PasswordHasher.HashPassword(registerUser.Password);
         var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
 
-        await appDbContext.Users.AddAsync(userToAdd);
-        await appDbContext.SaveChangesAsync();
+        await appDbContext.Users.AddAsync(userToAdd, cancellationToken);
+        await appDbContext.SaveChangesAsync(cancellationToken);
         return tokenService.GenerateToken(userToAdd);
     }
 
