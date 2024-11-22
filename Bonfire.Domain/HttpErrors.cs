@@ -2,27 +2,25 @@
 
 public static class HttpErrors
 {
-    public const string ConversationNotFoundException = "Этой переписки, к сожалению, не существует.";
-
-    public const string AccessToMessageDenied = "Эй! У тебя нет доступа к этому сообщению!";
-
-    public const string AccessToConversationDenied = "Эй! У тебя нет доступа к этой переписке!";
-
-    public const string ConversationAlreadyExistsException =
-        "Кажется, ты хочешь создать клона переписки! Но она уже есть!";
-
-    public const string MessageNotFound = "Посмотри лучше! Такого сообщения не существует!";
-
-    public const string InvalidLoginCredentials = "Проверь, правильные ли данные для входа ты ввёл, дружище!";
-
-    public const string ReceiverEqualsSenderException = "Ты не можешь написать самому себе!";
-
-    public const string NicknameAlreadyExists = "Этот никнейм уже занят, придумай новый!";
-
-    public const string MessageCannotBeEmpty = "Текст сообщения не может быть пустым. Напиши что-нибудь!";
-
-    public const string WrongConversationParticipants =
-        "Один или несколько пользователей из списка получателей не найдены!";
-
-    public const string InvalidRegistrationData = "Логин или пароль не введены. Введите их для регистрации.";
+    public const string ConversationNotFoundException = "Conversation not found.";
+    
+    public const string AccessToMessageDenied = "Access to this message denied.";
+    
+    public const string AccessToConversationDenied = "Access to this conversation denied.";
+    
+    public const string ConversationAlreadyExistsException = "Conversation already exists.";
+    
+    public const string MessageNotFound = "Message not found.";
+    
+    public const string InvalidLoginCredentials = "Invalid login credentials.";
+    
+    public const string ReceiverEqualsSenderException = "Cannot message yourself.";
+    
+    public const string NicknameAlreadyExists = "Nickname already taken.";
+    
+    public const string MessageCannotBeEmpty = "Message cannot be empty.";
+    
+    public const string WrongConversationParticipants = "Recipients not found.";
+    
+    public const string InvalidRegistrationData = "Username or password required.";
 }
