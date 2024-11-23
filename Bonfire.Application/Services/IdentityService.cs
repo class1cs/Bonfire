@@ -1,6 +1,7 @@
 ﻿using Bonfire.Application.Helpers;
 using Bonfire.Application.Interfaces;
 using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
 using Bonfire.Domain.Entities;
 using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
@@ -10,7 +11,7 @@ namespace Bonfire.Application.Services;
 
 public class IdentityService(ITokenService tokenService, AppDbContext appDbContext) : IIdentityService
 {
-    public async Task<string> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
+    public async Task<TokenDto> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
     {
         var authorizedUser = await VerifyLoginCredentials(loginRequestDto.NickName, loginRequestDto.Password, cancellationToken);
         if (authorizedUser is null)
@@ -19,10 +20,10 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         }
 
         var token = tokenService.GenerateToken(authorizedUser);
-        return token;
+        return new TokenDto(token, AuthOptions.AccessTokenValidity);
     }
 
-    public async Task<string> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken)
+    public async Task<TokenDto> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(registerUser.NickName) || string.IsNullOrWhiteSpace(registerUser.Password))
         {
@@ -34,14 +35,13 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         {
             throw new NicknameAlreadyExistsException();
         }
-          
-
         var passwordHash = PasswordHasher.HashPassword(registerUser.Password);
         var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
 
         await appDbContext.Users.AddAsync(userToAdd, cancellationToken);
         await appDbContext.SaveChangesAsync(cancellationToken);
-        return tokenService.GenerateToken(userToAdd);
+        var token = tokenService.GenerateToken(userToAdd);
+        return new TokenDto(token, AuthOptions.AccessTokenValidity);
     }
 
     public async Task<bool> CheckUserExists(string login, CancellationToken cancellationToken)

@@ -59,7 +59,8 @@ public class IdentityServiceTests
         var result = await loginService.Login(new LoginRequestDto(user.Nickname, "test"), default);
 
         // Assert
-        result.Should().Be("Token");
+        result.AccessToken.Should().Be("Token");
+        result.ExpiresAt.Should().Be(AuthOptions.AccessTokenValidity);
     }
 
 
@@ -129,7 +130,8 @@ public class IdentityServiceTests
         var result = await identityService.Register(request, default);
 
         // Assert
-        result.Should().Be("Token");
+        result.AccessToken.Should().Be("Token");
+        result.ExpiresAt.Should().Be(AuthOptions.AccessTokenValidity);
     }
 
     [Fact(DisplayName = "Регистрация выдает ошибку, если такой никнейм занят.")]
