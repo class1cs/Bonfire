@@ -1,4 +1,4 @@
-# Bonfire chat API
+# Bonfire API
 
 API чата под незамысловатым именем Bonfire (англ. Костёр)
 
