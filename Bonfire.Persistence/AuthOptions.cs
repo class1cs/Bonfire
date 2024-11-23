@@ -9,7 +9,7 @@ public class AuthOptions
 
     public const string Audience = "BelovedUser";
     
-    private const string Key = "ultrasecretkey_lol";
+    private const string Key = "SecretKeyForBonfire1333337777777";
 
     public static readonly DateTime AccessTokenValidity = DateTime.UtcNow.Add(TimeSpan.FromMinutes(1));
     

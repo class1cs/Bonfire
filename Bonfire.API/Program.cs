@@ -1,13 +1,4 @@
 using Bonfire.API.Extensions;
-using Bonfire.API.Middlewares;
-using Bonfire.Application.Interfaces;
-using Bonfire.Application.Services;
-using Bonfire.Persistance;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

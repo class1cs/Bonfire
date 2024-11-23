@@ -17,7 +17,7 @@ public class TokenService : ITokenService
         var jwt = new JwtSecurityToken(AuthOptions.Issuer,
             AuthOptions.Audience,
             claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromDays(2)),
+            expires: AuthOptions.AccessTokenValidity,
             signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
                 SecurityAlgorithms.HmacSha256));
 
