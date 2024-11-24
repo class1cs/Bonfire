@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -70,7 +69,6 @@ namespace Bonfire.Persistance.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Text = table.Column<string>(type: "text", nullable: false),
-                    SentTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     AuthorId = table.Column<long>(type: "bigint", nullable: false),
                     ConversationId = table.Column<long>(type: "bigint", nullable: false)
                 },

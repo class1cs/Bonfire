@@ -4,7 +4,7 @@ namespace Bonfire.Application.Interfaces;
 
 public interface IUserInfoService
 {
-    Task<UserDto> GetCurrentUserInfo();
+    Task<UserDto> GetCurrentUserInfo(CancellationToken cancellationToken);
 
-    Task<UserDto[]> SearchUser(string searchRequest);
+    Task<UserDto[]> SearchUser(string searchRequest, CancellationToken cancellationToken);
 }

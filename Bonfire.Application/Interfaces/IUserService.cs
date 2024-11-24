@@ -4,5 +4,5 @@ namespace Bonfire.Application.Interfaces;
 
 public interface IUserService
 {
-    Task<User> GetCurrentUser();
+    Task<User> GetCurrentUser(CancellationToken cancellationToken);
 }

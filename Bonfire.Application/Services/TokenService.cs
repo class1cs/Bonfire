@@ -1,28 +1,46 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Bonfire.Application.Interfaces;
+using Bonfire.Domain.Dtos.Responses;
 using Bonfire.Domain.Entities;
 using Bonfire.Persistance;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Bonfire.Application.Services;
 
 public class TokenService : ITokenService
 {
-    public string GenerateToken(User user)
+    private readonly IConfiguration _configuration;
+    private readonly TimeProvider _timeProvider;
+
+    public TokenService(IConfiguration configuration, TimeProvider timeProvider)
+    {
+        _configuration = configuration;
+        _timeProvider = timeProvider;
+    }
+    public TokenDto GenerateToken(User user)
     {
         var claims = new List<Claim>();
-        claims.Add(new Claim("Id", user.Id.ToString()));
+        
+        claims.Add(new Claim(ClaimTypes.Sid, user.Id.ToString()));
 
-        var jwt = new JwtSecurityToken(AuthOptions.Issuer,
-            AuthOptions.Audience,
+        var issuer = _configuration.GetValue<string>("AuthOptions:Issuer");
+        var audience = _configuration.GetValue<string>("AuthOptions:Audience");
+        var accessTokenValidityInDays = _configuration.GetValue<double>("AuthOptions:AccessTokenValidityInDays");
+        var accessTokenValidityDateTime = _timeProvider.GetUtcNow().AddDays(accessTokenValidityInDays).DateTime;
+        var key = _configuration.GetValue<string>("AuthOptions:Key");
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
+            
+        var jwt = new JwtSecurityToken(issuer,
+            audience,
             claims,
-            expires: AuthOptions.AccessTokenValidity,
-            signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
-                SecurityAlgorithms.HmacSha256));
+            expires: accessTokenValidityDateTime,
+            signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-        return encodedJwt;
+        return new TokenDto(encodedJwt, accessTokenValidityDateTime);
     }
 }

@@ -12,7 +12,7 @@ namespace Bonfire.Tests;
 
 public class ConversationsServiceTests
 {
-    public User CreateUser(long id = 1, string nick = "test")
+    private User CreateUser(long id = 1, string nick = "test")
     {
         var user = A.Fake<User>();
         user.Id = id;
@@ -36,7 +36,7 @@ public class ConversationsServiceTests
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
 
         await context.AddRangeAsync(user, user1);
@@ -67,7 +67,7 @@ public class ConversationsServiceTests
         var user2 = CreateUser(3, "test2");
         var user3 = CreateUser(4, "test3");
 
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
 
         var conversationsService = new ConversationsService(context, currentUserService);
 
@@ -97,7 +97,7 @@ public class ConversationsServiceTests
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
 
         var participantsIds = new List<long> { user1.Id };
@@ -131,7 +131,7 @@ public class ConversationsServiceTests
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
 
         var participantsIds = new List<long> { user.Id, user1.Id };
@@ -165,7 +165,7 @@ public class ConversationsServiceTests
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
 
         var participantsIds = new List<long> { user1.Id };
@@ -197,7 +197,7 @@ public class ConversationsServiceTests
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         var conversationsService = new ConversationsService(context, currentUserService);
 
         var participantsIds = new List<long> { 321, user1.Id };

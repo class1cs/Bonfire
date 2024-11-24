@@ -33,9 +33,9 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+        var timeProvider = A.Fake<TimeProvider>();
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -67,8 +67,9 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+        var timeProvider = A.Fake<TimeProvider>();
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -100,8 +101,9 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+        var timeProvider = A.Fake<TimeProvider>();
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var messagesService = new MessagesService(context, currentUserService,timeProvider);
 
         await context.AddAsync(user);
         await context.SaveChangesAsync();
@@ -126,9 +128,9 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -155,14 +157,16 @@ public class MessagesServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var context = new AppDbContext(options);
+        
         var user = CreateUser();
         var user1 = CreateUser("test1", 2);
+        
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messagesService = new MessagesService(context, currentUserService);
-
-        var messages = new List<Message> { new("text", user) };
+        var messages = new List<Message> { new("text", user, timeProvider.GetUtcNow()) };
         var participants = new List<User> { user, user1 };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -189,11 +193,11 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messagesService = new MessagesService(context, currentUserService);
-
-        var messages = new List<Message> { new("test", user) };
+        var messages = new List<Message> { new("test", user, timeProvider.GetUtcNow()) };
         var participants = new List<User> { user };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         var secondConversation = new Conversation(new List<Message>(), participants, ConversationType.Conversation);
@@ -224,11 +228,11 @@ public class MessagesServiceTests
         var secondUser = CreateUser(id: 2, name: "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messagesService = new MessagesService(context, currentUserService);
-
-        var messages = new List<Message> { new("test", secondUser) };
+        var messages = new List<Message> { new("test", secondUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { secondUser, firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -257,8 +261,9 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
         var messages = new List<Message>();
         var participants = new List<User> { user };
@@ -284,11 +289,11 @@ public class MessagesServiceTests
         var user = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messagesService = new MessagesService(context, currentUserService);
-
-        var messages = new List<Message> { new("test", user) };
+        var messages = new List<Message> { new("test", user, timeProvider.GetUtcNow()) };
         var participants = new List<User> { user };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
         var secondConversation = new Conversation(new List<Message>(), participants, ConversationType.Conversation);
@@ -316,11 +321,11 @@ public class MessagesServiceTests
         var secondUser = CreateUser(id: 2, name: "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messagesService = new MessagesService(context, currentUserService);
-
-        var messages = new List<Message> { new("test", secondUser) };
+        var messages = new List<Message> { new("test", secondUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { secondUser, firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -348,10 +353,11 @@ public class MessagesServiceTests
         var secondUser = CreateUser("test1", 2);
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messages = new List<Message> { new("test", secondUser) };
+        var messages = new List<Message> { new("test", secondUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { secondUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -379,13 +385,14 @@ public class MessagesServiceTests
         var secondUser = CreateUser("test1", 2);
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
         await context.AddAsync(firstUser);
         await context.AddAsync(secondUser);
 
-        var messages = new List<Message> { new("test", secondUser) };
+        var messages = new List<Message> { new("test", secondUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { secondUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -410,10 +417,11 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messages = new List<Message> { new("test", firstUser) };
+        var messages = new List<Message> { new("test", firstUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -443,10 +451,11 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messages = new List<Message> { new("test", firstUser) };
+        var messages = new List<Message> { new("test", firstUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 
@@ -475,10 +484,11 @@ public class MessagesServiceTests
         var firstUser = CreateUser();
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(firstUser);
-        var messagesService = new MessagesService(context, currentUserService);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(firstUser);
+        var timeProvider = A.Fake<TimeProvider>();
+        var messagesService = new MessagesService(context, currentUserService, timeProvider);
 
-        var messages = new List<Message> { new("test", firstUser) };
+        var messages = new List<Message> { new("test", firstUser, timeProvider.GetUtcNow()) };
         var participants = new List<User> { firstUser };
         var conversation = new Conversation(messages, participants, ConversationType.Dialogue);
 

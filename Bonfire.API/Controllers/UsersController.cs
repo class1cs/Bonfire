@@ -16,16 +16,16 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet(Routes.Users.SearchUsers)]
-    public async Task<IActionResult> SearchUsers(string searchRequest)
+    public async Task<IActionResult> SearchUsers(string searchRequest, CancellationToken cancellationToken)
     {
-        var responseDto = await _userInfoService.SearchUser(searchRequest);
+        var responseDto = await _userInfoService.SearchUser(searchRequest, cancellationToken);
         return Ok(responseDto);
     }
 
     [HttpGet(Routes.Users.GetCurrentUserInfo)]
-    public async Task<IActionResult> GetCurrentUserInfo()
+    public async Task<IActionResult> GetCurrentUserInfo(CancellationToken cancellationToken)
     {
-        var responseDto = await _userInfoService.GetCurrentUserInfo();
+        var responseDto = await _userInfoService.GetCurrentUserInfo(cancellationToken);
         return Ok(responseDto);
     }
 }

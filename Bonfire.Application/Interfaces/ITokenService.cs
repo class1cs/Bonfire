@@ -1,8 +1,9 @@
-﻿using Bonfire.Domain.Entities;
+﻿using Bonfire.Domain.Dtos.Responses;
+using Bonfire.Domain.Entities;
 
 namespace Bonfire.Application.Interfaces;
 
 public interface ITokenService
 {
-    public string GenerateToken(User user);
+    public TokenDto GenerateToken(User user);
 }

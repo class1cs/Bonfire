@@ -1,4 +1,6 @@
-﻿namespace Bonfire.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Bonfire.Domain.Entities;
 
 public class User
 {
@@ -12,7 +14,7 @@ public class User
     public User()
     {
     }
-
+    
     public long Id { get; set; }
 
     public string Nickname { get; set; }

@@ -12,7 +12,7 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
 {
     public async Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
 
         var receivers = await dbContext.Users
             .Where(u => conversationRequestDto.UsersIds.Contains(u.Id))
@@ -46,8 +46,6 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
                 )).ToArray(), existingChat.Type
             );
         }
-            
-           
 
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
 
@@ -67,7 +65,7 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
 
     public async Task<ConversationDto[]> GetConversations(CancellationToken cancellationToken, long offsetMessageId = 0, short limit = 50)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
         var conversations = await dbContext.Conversations
             .AsNoTracking()
             .Include(x => x.Participants)

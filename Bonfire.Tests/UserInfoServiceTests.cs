@@ -35,8 +35,8 @@ public class UserInfoServiceTests
         var httpContextAccessor = A.Fake<IHttpContextAccessor>();
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
-        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim("Id", "1")));
-        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity.IsAuthenticated).Returns(true);
+        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim(ClaimTypes.Sid, "1")));
+        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated).Returns(true);
         A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
 
 
@@ -48,7 +48,7 @@ public class UserInfoServiceTests
         var userInfoService = new UserService(httpContextAccessor, context);
 
         // Act
-        var result = await userInfoService.GetCurrentUser();
+        var result = await userInfoService.GetCurrentUser(default);
 
         // Assert
         result.Should().NotBeNull();
@@ -70,8 +70,8 @@ public class UserInfoServiceTests
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
-        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim("Id", "1")));
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim(ClaimTypes.Sid, "1")));
         A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated).Returns(true);
         A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
 
@@ -80,7 +80,7 @@ public class UserInfoServiceTests
         var userInfoService = new UserInfoService(currentUserService, context);
 
         // Act
-        var result = await userInfoService.SearchUser("test");
+        var result = await userInfoService.SearchUser("test", default);
 
         // Assert
         result.Length.Should().Be(1);
@@ -101,14 +101,14 @@ public class UserInfoServiceTests
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser()).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
         await context.AddAsync(user);
         await context.SaveChangesAsync();
 
         var userInfoService = new UserInfoService(currentUserService, context);
 
         // Act
-        var result = await userInfoService.SearchUser("test");
+        var result = await userInfoService.SearchUser("test", default);
 
         // Assert
         result.Length.Should().Be(0);

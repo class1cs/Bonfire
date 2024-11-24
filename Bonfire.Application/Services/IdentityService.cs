@@ -19,8 +19,8 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
             throw new InvalidLoginCredentialsException();
         }
 
-        var token = tokenService.GenerateToken(authorizedUser);
-        return new TokenDto(token, AuthOptions.AccessTokenValidity);
+        var tokenDto = tokenService.GenerateToken(authorizedUser);
+        return tokenDto;
     }
 
     public async Task<TokenDto> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken)
@@ -40,8 +40,8 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
 
         await appDbContext.Users.AddAsync(userToAdd, cancellationToken);
         await appDbContext.SaveChangesAsync(cancellationToken);
-        var token = tokenService.GenerateToken(userToAdd);
-        return new TokenDto(token, AuthOptions.AccessTokenValidity);
+        var tokenDto = tokenService.GenerateToken(userToAdd);
+        return tokenDto;
     }
 
     public async Task<bool> CheckUserExists(string login, CancellationToken cancellationToken)

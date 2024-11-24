@@ -1,6 +1,7 @@
 ﻿using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
 using Bonfire.Domain.Dtos.Requests;
+using Bonfire.Domain.Dtos.Responses;
 using Bonfire.Domain.Entities;
 using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
@@ -25,7 +26,9 @@ public class IdentityServiceTests
         var user = CreateUser();
 
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var timeProvider = A.Fake<TimeProvider>();
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
         var loginService = new IdentityService(tokenService, context);
 
         await context.AddAsync(user);
@@ -49,7 +52,9 @@ public class IdentityServiceTests
         var user = CreateUser();
 
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var timeProvider = A.Fake<TimeProvider>();
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
         var loginService = new IdentityService(tokenService, context);
 
         await context.AddAsync(user);
@@ -60,7 +65,7 @@ public class IdentityServiceTests
 
         // Assert
         result.AccessToken.Should().Be("Token");
-        result.ExpiresAt.Should().Be(AuthOptions.AccessTokenValidity);
+        result.ExpiresAt.Should().Be(utcNow);
     }
 
 
@@ -75,7 +80,8 @@ public class IdentityServiceTests
         var user = CreateUser();
 
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var timeProvider = A.Fake<TimeProvider>();
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", timeProvider.GetUtcNow()));
         var loginService = new IdentityService(tokenService, context);
 
         await context.AddAsync(user);
@@ -121,7 +127,9 @@ public class IdentityServiceTests
         A.CallTo(() => passwordHasherService.HashPassword("test")).WithAnyArguments()
             .Returns("$2a$11$h7D6B.QDKZCSzlHfXa.hpO7bB9ySYwkRdI6VQTxl4sp0K/b6F61Fq");
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var timeProvider = A.Fake<TimeProvider>();
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
         
         var context = new AppDbContext(options);
         var identityService = new IdentityService(tokenService, context);
@@ -131,7 +139,7 @@ public class IdentityServiceTests
 
         // Assert
         result.AccessToken.Should().Be("Token");
-        result.ExpiresAt.Should().Be(AuthOptions.AccessTokenValidity);
+        result.ExpiresAt.Should().Be(utcNow);
     }
 
     [Fact(DisplayName = "Регистрация выдает ошибку, если такой никнейм занят.")]
@@ -145,7 +153,10 @@ public class IdentityServiceTests
         var request = new RegisterRequestDto(user.Nickname, "test");
         
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var timeProvider = A.Fake<TimeProvider>();
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
+        
         var context = new AppDbContext(options);
         var identityService = new IdentityService(tokenService, context);
         
@@ -167,8 +178,12 @@ public class IdentityServiceTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var request = new RegisterRequestDto(string.Empty, string.Empty);
+        
+        var timeProvider = A.Fake<TimeProvider>();
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(new User())).WithAnyArguments().Returns("Token");
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(new User())).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
+        
         var context = new AppDbContext(options);
         var identityService = new IdentityService(tokenService, context);
 
@@ -186,8 +201,12 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var user = CreateUser();
+        
+        var timeProvider = A.Fake<TimeProvider>();
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(new User())).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
+        
         var context = new AppDbContext(options);
         var identityService = new IdentityService(tokenService, context);
         
@@ -210,11 +229,14 @@ public class IdentityServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         var user = CreateUser();
+        
+        var timeProvider = A.Fake<TimeProvider>();
         var passwordHasherService = A.Fake<IPasswordHasherService>();
         A.CallTo(() => passwordHasherService.HashPassword("test")).WithAnyArguments()
             .Returns("$2a$11$h7D6B.QDKZCSzlHfXa.hpO7bB9ySYwkRdI6VQTxl4sp0K/b6F61Fq");
         var tokenService = A.Fake<ITokenService>();
-        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns("Token");
+        var utcNow = timeProvider.GetUtcNow(); 
+        A.CallTo(() => tokenService.GenerateToken(user)).WithAnyArguments().Returns(new TokenDto("Token", utcNow));
         var context = new AppDbContext(options);
         var identityService = new IdentityService(tokenService, context);
 

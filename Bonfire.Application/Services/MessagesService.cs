@@ -8,22 +8,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
 
-public class MessagesService(AppDbContext dbContext, IUserService userService) : IMessagesService
+public class MessagesService(AppDbContext dbContext, IUserService userService, TimeProvider timeProvider) : IMessagesService
 {
     public async Task<MessageDto> SendMessage(MessageRequestDto messageRequestDto, long conversationId, CancellationToken cancellationToken)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
         var conversation = await dbContext.Conversations.Include(x => x.Messages)
             .Include(conversation => conversation.Participants).FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken: cancellationToken);
 
-        if (conversation == null) throw new ConversationNotFoundException();
+        if (conversation == null) 
+            throw new ConversationNotFoundException();
 
-        if (conversation.Participants.All(x => x.Id != currentUser.Id)) throw new AccessToConversationDeniedException();
+        if (conversation.Participants.All(x => x.Id != currentUser.Id)) 
+            throw new AccessToConversationDeniedException();
 
-        if (string.IsNullOrWhiteSpace(messageRequestDto.Text)) throw new EmptyMessageTextException();
+        if (string.IsNullOrWhiteSpace(messageRequestDto.Text)) 
+            throw new EmptyMessageTextException();
 
-        var message = new Message(messageRequestDto.Text, currentUser);
-
+        var message = new Message(messageRequestDto.Text, currentUser, timeProvider.GetUtcNow());
         conversation!.Messages.Add(message);
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -42,7 +44,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
 
     public async Task<MessageDto> EditMessage(MessageRequestDto messageRequestDto, long messageId, long conversationId, CancellationToken cancellationToken)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
 
         var conversation = await dbContext.Conversations.FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken: cancellationToken);
         var message = await dbContext.Messages.Include(message => message.Author)
@@ -78,7 +80,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
 
     public async Task<MessageDto> RemoveMessage(long messageId, long conversationId, CancellationToken cancellationToken)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
 
         var message = await dbContext.Messages
             .Include(message => message.Author)
@@ -108,7 +110,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService) :
 
     public async Task<MessagesDto> GetMessages(CancellationToken cancellationToken, long conversationId, long offsetMessageId = 0, short limit = 50)
     {
-        var currentUser = await userService.GetCurrentUser();
+        var currentUser = await userService.GetCurrentUser(cancellationToken);
 
         var conversation = await dbContext.Conversations
             .Include(x => x.Messages.Where(b => b.Id > offsetMessageId).Take(limit))

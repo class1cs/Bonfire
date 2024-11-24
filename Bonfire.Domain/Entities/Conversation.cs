@@ -1,4 +1,6 @@
-﻿namespace Bonfire.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Bonfire.Domain.Entities;
 
 public class Conversation
 {
@@ -12,7 +14,8 @@ public class Conversation
     public Conversation()
     {
     }
-
+    
+    
     public long Id { get; set; }
 
     public ICollection<Message> Messages { get; set; }
