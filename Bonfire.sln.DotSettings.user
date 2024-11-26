@@ -1,5 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f45f4d58_002Df98f_002D4b6d_002D8f95_002D9b5de4da16a0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="UserServiceTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Solution /&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5f57abe1_002Df238_002D46e4_002Db215_002D2f1c6b7ad6e9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="После успешного входа должно возвращаться DTO с токеном (200)" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.AuthControllerTests.Login_Should_Return_200_If_Successful&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::42B823CE-E6F1-499C-B5F8-81EE9A88FBA0::net8.0::Bonfire.Tests.AuthControllerTests.Login_Should_Return_Error_If_Account_Does_Not_Exists&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

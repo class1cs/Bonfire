@@ -26,7 +26,7 @@ public class MessagesService(AppDbContext dbContext, IUserService userService, T
             throw new EmptyMessageTextException();
 
         var message = new Message(messageRequestDto.Text, currentUser, timeProvider.GetUtcNow());
-        conversation!.Messages.Add(message);
+        conversation.Messages.Add(message);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new MessageDto

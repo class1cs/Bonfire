@@ -50,6 +50,7 @@ services.AddSwaggerGen(c =>
 
 services.AddProblemDetails()
     .AddHttpContextAccessor()
+    .AddSerilog()
     .AddControllers();  
 
 services.AddExceptionHandler<ExceptionMiddleware>()
@@ -65,6 +66,9 @@ services.AddExceptionHandler<ExceptionMiddleware>()
         options.UseNpgsql(connString); 
     });
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
 
 services.AddAuthorization();
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -98,3 +102,5 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.Run();
+
+public partial class Program { }
