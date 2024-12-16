@@ -11,12 +11,14 @@ public class ExceptionMiddleware : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is not BaseException baseException) 
+        if (exception is not BaseException baseException)
+        {
             return false;
+        }
 
         var problemDetails = new ProblemDetails
         {
-            Status = (int)baseException.ErrorCode,
+            Status = (int) baseException.ErrorCode,
             Title = baseException.Message
         };
 

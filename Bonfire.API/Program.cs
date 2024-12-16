@@ -21,22 +21,24 @@ var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
 var services = builder.Services;
 
 services.AddEndpointsApiExplorer();
+
 services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new()
     {
-        Type = SecuritySchemeType.Http, In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        In = ParameterLocation.Header,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         Description = "Авторизация через JWT."
     });
-    
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+
+    c.AddSecurityRequirement(new()
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                Reference = new()
                 {
                     Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
@@ -51,7 +53,7 @@ services.AddSwaggerGen(c =>
 services.AddProblemDetails()
     .AddHttpContextAccessor()
     .AddSerilog()
-    .AddControllers();  
+    .AddControllers();
 
 services.AddExceptionHandler<ExceptionMiddleware>()
     .AddScoped<ITokenService, TokenService>()
@@ -63,7 +65,7 @@ services.AddExceptionHandler<ExceptionMiddleware>()
     .AddSingleton(TimeProvider.System)
     .AddDbContext<AppDbContext>(options =>
     {
-        options.UseNpgsql(connString); 
+        options.UseNpgsql(connString);
     });
 
 Log.Logger = new LoggerConfiguration()
@@ -71,10 +73,11 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 services.AddAuthorization();
+
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
             ValidIssuer = issuer,
@@ -103,4 +106,6 @@ app.UseExceptionHandler();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}

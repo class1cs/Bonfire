@@ -2,4 +2,7 @@
 
 namespace Bonfire.Domain.Dtos.Responses;
 
-public record ConversationDto(long ConversationId, UserDto[] Participants, ConversationType ConversationType);
+public record ConversationDto(
+    long ConversationId,
+    UserDto[] Participants,
+    ConversationType ConversationType);

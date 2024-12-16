@@ -13,9 +13,12 @@ public class UserService(IHttpContextAccessor httpContextAccessor, AppDbContext 
     {
         var currentUserIdString =
             httpContextAccessor.HttpContext!.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Sid)!.Value;
+
         var currentUserIdLong = Convert.ToInt64(currentUserIdString);
+
         var currentUser = await appDbContext.Users.Include(x => x.Conversations)
-            .FirstAsync(x => x.Id == currentUserIdLong, cancellationToken: cancellationToken);
+            .FirstAsync(x => x.Id == currentUserIdLong, cancellationToken);
+
         return currentUser;
     }
 }

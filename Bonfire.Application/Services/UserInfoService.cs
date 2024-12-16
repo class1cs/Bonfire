@@ -10,15 +10,19 @@ public class UserInfoService(IUserService userService, AppDbContext appDbContext
     public async Task<UserDto> GetCurrentUserInfo(CancellationToken cancellationToken)
     {
         var user = await userService.GetCurrentUser(cancellationToken);
-        return new UserDto(user.Id, user.Nickname);
+
+        return new(user.Id, user.Nickname);
     }
 
     public async Task<UserDto[]> SearchUser(string userNickNameRequest, CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser(cancellationToken);
+
         var users = await appDbContext.Users.AsNoTracking()
             .Where(x => x.Nickname.Contains(userNickNameRequest) && x.Nickname != currentUser.Nickname)
-            .Select(x => new UserDto(x.Id, x.Nickname)).ToArrayAsync(cancellationToken);
+            .Select(x => new UserDto(x.Id, x.Nickname))
+            .ToArrayAsync(cancellationToken);
+
         return users;
     }
 }

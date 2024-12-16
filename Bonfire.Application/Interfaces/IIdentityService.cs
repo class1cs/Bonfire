@@ -7,10 +7,13 @@ namespace Bonfire.Application.Interfaces;
 public interface IIdentityService
 {
     Task<TokenDto> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken);
-    
+
     Task<TokenDto> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken);
-    
+
     Task<bool> CheckUserExists(string login, CancellationToken cancellationToken);
-    
-    Task<User?> VerifyLoginCredentials(string nickName, string password, CancellationToken cancellationToken);
+
+    Task<User?> VerifyLoginCredentials(
+        string nickName,
+        string password,
+        CancellationToken cancellationToken);
 }

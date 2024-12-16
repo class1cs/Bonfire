@@ -23,13 +23,14 @@ public class TokenServiceTests
         return user;
     }
 
-
     [Fact(DisplayName = "Возврат токена при передаче юзера.")]
     public async void Login_Should_Fail_If_Login_Data_Incorrect()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
@@ -45,10 +46,11 @@ public class TokenServiceTests
                             "AccessTokenValidityInDays": "2"
                           }}
                           """;
+
         var builder = new ConfigurationBuilder();
         builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(appSettings)));
         var configuration = builder.Build();
-        
+
         var tokenService = new TokenService(configuration, timeProvider);
 
         await context.AddAsync(user);
@@ -57,9 +59,11 @@ public class TokenServiceTests
         // Act
         var result = tokenService.GenerateToken(user);
 
-
         // Assert
-        result.AccessToken.Should().NotBeNullOrWhiteSpace();
-        result.ExpiresAt.Should().NotBe(null);
+        result.AccessToken.Should()
+            .NotBeNullOrWhiteSpace();
+
+        result.ExpiresAt.Should()
+            .NotBe(null);
     }
 }

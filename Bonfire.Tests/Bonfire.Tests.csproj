@@ -7,21 +7,21 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-	<PreserveCompilationContext>true</PreserveCompilationContext>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.0"/>
         <PackageReference Include="FakeItEasy" Version="8.3.0"/>
         <PackageReference Include="FluentAssertions" Version="7.0.0-alpha.4"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.2-dev-00341"/>
         <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0"/>
         <PackageReference Include="xunit" Version="2.5.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3"/>
     </ItemGroup>
@@ -31,7 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Bonfire.API\Bonfire.API.csproj" />
+        <ProjectReference Include="..\Bonfire.API\Bonfire.API.csproj"/>
         <ProjectReference Include="..\Bonfire.Application\Bonfire.Application.csproj"/>
         <ProjectReference Include="..\Bonfire.Persistence\Bonfire.Persistence.csproj"/>
     </ItemGroup>
@@ -41,17 +41,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="TestAppSettings.json">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+        <Content Update="TestAppSettings.json">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TestAppSettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="TestAppSettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

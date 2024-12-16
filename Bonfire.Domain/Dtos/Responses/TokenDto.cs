@@ -9,6 +9,6 @@ public class TokenDto
     }
 
     public string AccessToken { get; private set; }
-    
+
     public DateTimeOffset ExpiresAt { get; private set; }
 }

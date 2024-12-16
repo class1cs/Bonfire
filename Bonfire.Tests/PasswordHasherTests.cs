@@ -13,6 +13,8 @@ public class PasswordHasherTests
 
         // Assert
         var verifyHash = BCrypt.Net.BCrypt.EnhancedVerify("test", hash);
-        verifyHash.Should().BeTrue();
+
+        verifyHash.Should()
+            .BeTrue();
     }
 }

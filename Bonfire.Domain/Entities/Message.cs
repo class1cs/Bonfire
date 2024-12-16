@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Bonfire.Domain.Entities;
+﻿namespace Bonfire.Domain.Entities;
 
 public class Message
 {
-    public Message(string text, User author, DateTimeOffset sentTime)
+    public Message(
+        string text,
+        User author,
+        DateTimeOffset sentTime)
     {
         Text = text;
         Author = author;
@@ -14,12 +15,12 @@ public class Message
     public Message()
     {
     }
-    
+
     public long Id { get; set; }
 
     public string Text { get; set; }
 
-    public DateTimeOffset SentTime { get; } 
+    public DateTimeOffset SentTime { get; }
 
     public User Author { get; set; }
 

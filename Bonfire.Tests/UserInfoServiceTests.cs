@@ -27,7 +27,8 @@ public class UserInfoServiceTests
     public async void User_Should_Be_Returned_If_Token_Is_Right()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
 
         var context = new AppDbContext(options);
@@ -35,15 +36,20 @@ public class UserInfoServiceTests
         var httpContextAccessor = A.Fake<IHttpContextAccessor>();
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
-        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim(ClaimTypes.Sid, "1")));
-        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated).Returns(true);
-        A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
+        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new(ClaimTypes.Sid, "1")));
 
+        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated)
+            .Returns(true);
+
+        A.CallTo(() => httpContextAccessor.HttpContext.User.Claims)
+            .Returns(new List<Claim>
+            {
+                userIdClaim
+            });
 
         var user = CreateUser();
         await context.AddAsync(user);
         await context.SaveChangesAsync();
-
 
         var userInfoService = new UserService(httpContextAccessor, context);
 
@@ -51,15 +57,19 @@ public class UserInfoServiceTests
         var result = await userInfoService.GetCurrentUser(default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(1);
+        result.Should()
+            .NotBeNull();
+
+        result.Id.Should()
+            .Be(1);
     }
 
     [Fact(DisplayName = "Должно возвращать пользователей по имени при поиске.")]
     public async void Should_Return_User_If_Data_Correct()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
 
         var context = new AppDbContext(options);
@@ -70,10 +80,20 @@ public class UserInfoServiceTests
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
-        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new Claim(ClaimTypes.Sid, "1")));
-        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated).Returns(true);
-        A.CallTo(() => httpContextAccessor.HttpContext.User.Claims).Returns(new List<Claim> { userIdClaim });
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
+        var userIdClaim = A.Fake<Claim>(x => x.WithArgumentsForConstructor(() => new(ClaimTypes.Sid, "1")));
+
+        A.CallTo(() => httpContextAccessor.HttpContext.User.Identity!.IsAuthenticated)
+            .Returns(true);
+
+        A.CallTo(() => httpContextAccessor.HttpContext.User.Claims)
+            .Returns(new List<Claim>
+            {
+                userIdClaim
+            });
 
         await context.AddRangeAsync(user, user1);
         await context.SaveChangesAsync();
@@ -83,15 +103,20 @@ public class UserInfoServiceTests
         var result = await userInfoService.SearchUser("test", default);
 
         // Assert
-        result.Length.Should().Be(1);
-        result[0].NickName.Should().Be("test1");
+        result.Length.Should()
+            .Be(1);
+
+        result[0]
+            .NickName.Should()
+            .Be("test1");
     }
 
     [Fact(DisplayName = "Должно возвращать пустой список при поиске, если пользователи, кроме текущего, не найдены.")]
     public async void Should_Return_Blank_List_If_User_Except_Current_Not_Found()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
 
         var context = new AppDbContext(options);
@@ -101,7 +126,10 @@ public class UserInfoServiceTests
         httpContextAccessor.HttpContext = A.Fake<HttpContext>();
         httpContextAccessor.HttpContext.User = A.Fake<ClaimsPrincipal>();
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         await context.AddAsync(user);
         await context.SaveChangesAsync();
 
@@ -111,6 +139,7 @@ public class UserInfoServiceTests
         var result = await userInfoService.SearchUser("test", default);
 
         // Assert
-        result.Length.Should().Be(0);
+        result.Length.Should()
+            .Be(0);
     }
 }

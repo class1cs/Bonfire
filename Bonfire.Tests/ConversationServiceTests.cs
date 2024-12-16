@@ -1,6 +1,5 @@
 ﻿using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
-using Bonfire.Domain.Dtos.Requests;
 using Bonfire.Domain.Entities;
 using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
@@ -23,42 +22,59 @@ public class ConversationsServiceTests
         return user;
     }
 
-
     [Fact(DisplayName = "При создании переписки она должна иметь тип 'Диалог', если в ней всего 2 пользователя")]
     public async void Conversation_Should_Be_Created_As_Dialogue_If_Two_Users_In_It()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         var conversationsService = new ConversationsService(context, currentUserService);
 
         await context.AddRangeAsync(user, user1);
         await context.SaveChangesAsync();
-        var participants = new List<long> { user1.Id };
+
+        var participants = new List<long>
+        {
+            user1.Id
+        };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants), default);
+        var result = await conversationsService.CreateConversation(new(participants), default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.ConversationId.Should().Be(1);
-        result.Participants.Length.Should().Be(2);
-        result.ConversationType.Should().Be(ConversationType.Dialogue);
+        result.Should()
+            .NotBeNull();
+
+        result.ConversationId.Should()
+            .Be(1);
+
+        result.Participants.Length.Should()
+            .Be(2);
+
+        result.ConversationType.Should()
+            .Be(ConversationType.Dialogue);
     }
 
     [Fact(DisplayName = "При создании переписки она должна иметь тип 'Беседа', если в ней 3 и более пользователя")]
     public async void Conversation_Should_Be_Created_As_Group_Conversation_If_Three_Or_More_Users_In_It()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
         var currentUserService = A.Fake<IUserService>();
 
@@ -67,42 +83,70 @@ public class ConversationsServiceTests
         var user2 = CreateUser(3, "test2");
         var user3 = CreateUser(4, "test3");
 
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
 
         var conversationsService = new ConversationsService(context, currentUserService);
 
         await context.AddRangeAsync(user, user1, user2, user3);
         await context.SaveChangesAsync();
-        var participants = new List<long> { user1.Id, user2.Id, user3.Id };
+
+        var participants = new List<long>
+        {
+            user1.Id,
+            user2.Id,
+            user3.Id
+        };
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participants), default);
+        var result = await conversationsService.CreateConversation(new(participants), default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.ConversationId.Should().Be(1);
-        result.ConversationType.Should().Be(ConversationType.Conversation);
-        result.Participants.Length.Should().Be(4);
+        result.Should()
+            .NotBeNull();
+
+        result.ConversationId.Should()
+            .Be(1);
+
+        result.ConversationType.Should()
+            .Be(ConversationType.Conversation);
+
+        result.Participants.Length.Should()
+            .Be(4);
     }
 
     [Fact(DisplayName = "При создании диалога, который уже существует, должна возвращаться информация о нём.")]
     public async void Dto_Should_Be_Returned_If_Dialogue_Already_Exists()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         var conversationsService = new ConversationsService(context, currentUserService);
 
-        var participantsIds = new List<long> { user1.Id };
-        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
-        var conversation = new Conversation(new List<Message>(), new List<User>(receivers) { user },
+        var participantsIds = new List<long>
+        {
+            user1.Id
+        };
+
+        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id))
+            .ToListAsync();
+
+        var conversation = new Conversation(new List<Message>(), new List<User>(receivers)
+            {
+                user
+            },
             ConversationType.Dialogue);
 
         await context.AddRangeAsync(user, user1);
@@ -110,33 +154,55 @@ public class ConversationsServiceTests
         await context.SaveChangesAsync();
 
         // Act
-        var result = await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
+        var result = await conversationsService.CreateConversation(new(participantsIds), default);
 
         // Assert
-        result.Should().NotBeNull();
-        result.ConversationId.Should().Be(1);
-        result.ConversationType.Should().Be(ConversationType.Dialogue);
-        result.Participants.Length.Should().NotBe(0);
+        result.Should()
+            .NotBeNull();
+
+        result.ConversationId.Should()
+            .Be(1);
+
+        result.ConversationType.Should()
+            .Be(ConversationType.Dialogue);
+
+        result.Participants.Length.Should()
+            .NotBe(0);
     }
 
     [Fact(DisplayName = "При попытке создания диалога с самим собой, должна выдаваться ошибка")]
     public async void Conversation_Should_Not_Be_Created_If_Receiver_Equals_Sender()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         var conversationsService = new ConversationsService(context, currentUserService);
 
-        var participantsIds = new List<long> { user.Id, user1.Id };
-        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
-        var conversation = new Conversation(new List<Message>(), new List<User>(receivers) { user },
+        var participantsIds = new List<long>
+        {
+            user.Id,
+            user1.Id
+        };
+
+        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id))
+            .ToListAsync();
+
+        var conversation = new Conversation(new List<Message>(), new List<User>(receivers)
+            {
+                user
+            },
             ConversationType.Dialogue);
 
         await context.AddRangeAsync(user, user1);
@@ -146,31 +212,46 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
+            await conversationsService.CreateConversation(new(participantsIds), default);
         };
 
         // Assert
-        await result.Should().ThrowAsync<ReceiverEqualsSenderException>();
+        await result.Should()
+            .ThrowAsync<ReceiverEqualsSenderException>();
     }
 
     [Fact(DisplayName = "При получении переписок (диалоги и групповые чаты), должно возращать список переписок")]
     public async void Conversation_Should_Be_Returned_As_List()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         var conversationsService = new ConversationsService(context, currentUserService);
 
-        var participantsIds = new List<long> { user1.Id };
-        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
-        var conversation = new Conversation(new List<Message>(), new List<User>(receivers) { user },
+        var participantsIds = new List<long>
+        {
+            user1.Id
+        };
+
+        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id))
+            .ToListAsync();
+
+        var conversation = new Conversation(new List<Message>(), new List<User>(receivers)
+            {
+                user
+            },
             ConversationType.Dialogue);
 
         await context.AddRangeAsync(user, user1);
@@ -181,7 +262,8 @@ public class ConversationsServiceTests
         var result = await conversationsService.GetConversations(default);
 
         // Assert
-        result.Length.Should().NotBe(0);
+        result.Length.Should()
+            .NotBe(0);
     }
 
     [Fact(DisplayName =
@@ -189,20 +271,35 @@ public class ConversationsServiceTests
     public async void Conversation_Should_Not_Be_Created_If_Users_Ids_Is_Wrong()
     {
         // Arrange
-        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString())
+        var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(Guid.NewGuid()
+                .ToString())
             .Options;
+
         var context = new AppDbContext(options);
 
         var user = CreateUser();
         var user1 = CreateUser(2, "test1");
 
         var currentUserService = A.Fake<IUserService>();
-        A.CallTo(() => currentUserService.GetCurrentUser(default)).Returns(user);
+
+        A.CallTo(() => currentUserService.GetCurrentUser(default))
+            .Returns(user);
+
         var conversationsService = new ConversationsService(context, currentUserService);
 
-        var participantsIds = new List<long> { 321, user1.Id };
-        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id)).ToListAsync();
-        var conversation = new Conversation(new List<Message>(), new List<User>(receivers) { user },
+        var participantsIds = new List<long>
+        {
+            321,
+            user1.Id
+        };
+
+        var receivers = await context.Users.Where(u => participantsIds.Contains(u.Id))
+            .ToListAsync();
+
+        var conversation = new Conversation(new List<Message>(), new List<User>(receivers)
+            {
+                user
+            },
             ConversationType.Dialogue);
 
         await context.AddRangeAsync(user, user1);
@@ -212,10 +309,11 @@ public class ConversationsServiceTests
         // Act
         var result = async () =>
         {
-            await conversationsService.CreateConversation(new ConversationRequestDto (participantsIds), default);
+            await conversationsService.CreateConversation(new(participantsIds), default);
         };
 
         // Assert
-        await result.Should().ThrowAsync<WrongConversationParticipantsIdsException>();
+        await result.Should()
+            .ThrowAsync<WrongConversationParticipantsIdsException>();
     }
 }

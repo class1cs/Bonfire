@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Bonfire.Domain.Entities;
+﻿namespace Bonfire.Domain.Entities;
 
 public class User
 {
-    public User(string nickname, string passwordHash, ICollection<Conversation> conversations)
+    public User(
+        string nickname,
+        string passwordHash,
+        ICollection<Conversation> conversations)
     {
         Nickname = nickname;
         PasswordHash = passwordHash;
@@ -14,7 +15,7 @@ public class User
     public User()
     {
     }
-    
+
     public long Id { get; set; }
 
     public string Nickname { get; set; }
