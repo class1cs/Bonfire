@@ -54,7 +54,6 @@ public class IdentityServiceTests
             .Options;
 
         var context = new AppDbContext(options);
-
         var user = CreateUser();
 
         var tokenService = A.Fake<ITokenService>();

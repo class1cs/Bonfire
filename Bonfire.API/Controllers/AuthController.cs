@@ -1,9 +1,11 @@
 using Bonfire.Application.Interfaces;
 using Bonfire.Domain.Dtos.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bonfire.API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 public class AuthController : ControllerBase
 {

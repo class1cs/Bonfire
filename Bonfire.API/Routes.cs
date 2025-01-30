@@ -18,16 +18,16 @@ public static class Routes
 
     public static class Chat
     {
-        public const string SendMessage = "api/chat/conversation/{conversationId:long}/messages";
+        public const string SendMessage = "api/chat/conversations/{conversationId:long}/messages";
 
-        public const string GetMessages = "api/chat/conversation/{conversationId:long}/messages";
+        public const string GetMessages = "api/chat/conversations/{conversationId:long}/messages";
 
-        public const string EditMessage = "api/chat/conversation/{conversationId:long}/messages/{messageId:long}";
+        public const string EditMessage = "api/chat/conversations/{conversationId:long}/messages/{messageId:long}";
 
-        public const string RemoveMessage = "api/chat/conversation/{conversationId:long}/messages/{messageId:long}";
+        public const string RemoveMessage = "api/chat/conversations/{conversationId:long}/messages/{messageId:long}";
 
-        public const string CreateConversation = "api/chat/conversation";
+        public const string CreateConversation = "api/chat/conversations";
 
-        public const string GetConversations = "api/chat/conversation";
+        public const string GetConversations = "api/chat/conversations";
     }
 }

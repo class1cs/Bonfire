@@ -28,10 +28,10 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     {
         // Arrange
         var credentials = new RegisterRequestDto("testUser", "testPassword");
-        await _client.PostAsJsonAsync(Routes.Auth.Register, credentials);
+        await _client.PostAsJsonAsync("api/auth/register", credentials);
 
         // Act
-        var loginRequest = await _client.PostAsJsonAsync(Routes.Auth.Login, credentials);
+        var loginRequest = await _client.PostAsJsonAsync("api/auth/login", credentials);
 
         // Assert
         loginRequest.StatusCode.Should()
@@ -45,7 +45,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         var credentials = new LoginRequestDto("testUser", "testPassword");
 
         // Act
-        var loginRequest = await _client.PostAsJsonAsync(Routes.Auth.Login, credentials);
+        var loginRequest = await _client.PostAsJsonAsync("api/auth/login", credentials);
 
         // Assert
         loginRequest.StatusCode.Should()
@@ -58,10 +58,10 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         // Arrange
         var rightCredentials = new LoginRequestDto("testUser", "testPassword");
         var wrongCredentials = new RegisterRequestDto("testUser", "wrongPassword");
-        await _client.PostAsJsonAsync(Routes.Auth.Register, rightCredentials);
+        await _client.PostAsJsonAsync("api/auth/register", rightCredentials);
 
         // Act
-        var loginRequest = await _client.PostAsJsonAsync(Routes.Auth.Login, wrongCredentials);
+        var loginRequest = await _client.PostAsJsonAsync("api/auth/login", wrongCredentials);
 
         // Assert
         loginRequest.StatusCode.Should()
@@ -75,7 +75,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         var registerData = new RegisterRequestDto("testUser", "testPassword");
 
         // Act
-        var registerRequest = await _client.PostAsJsonAsync(Routes.Auth.Register, registerData);
+        var registerRequest = await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         // Assert
         registerRequest.StatusCode.Should()
@@ -87,10 +87,10 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     {
         // Arrange
         var registerData = new RegisterRequestDto("testUser", "testPassword");
-        await _client.PostAsJsonAsync(Routes.Auth.Register, registerData);
+        await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         // Act
-        var registerRequest = await _client.PostAsJsonAsync(Routes.Auth.Register, registerData);
+        var registerRequest = await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         // Assert
         registerRequest.StatusCode.Should()
@@ -104,7 +104,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         var registerData = new RegisterRequestDto(string.Empty, string.Empty);
 
         // Act
-        var registerRequest = await _client.PostAsJsonAsync(Routes.Auth.Register, registerData);
+        var registerRequest = await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         // Assert
         registerRequest.StatusCode.Should()
