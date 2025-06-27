@@ -21,7 +21,7 @@ public class TokenService : ITokenService
         _timeProvider = timeProvider;
     }
 
-    public TokenDto GenerateToken(User user)
+    public TokenResponse GenerateToken(User user)
     {
         var claims = new List<Claim>();
 

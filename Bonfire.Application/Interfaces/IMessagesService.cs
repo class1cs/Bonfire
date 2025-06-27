@@ -5,23 +5,23 @@ namespace Bonfire.Application.Interfaces;
 
 public interface IMessagesService
 {
-    Task<MessageDto> SendMessage(
-        MessageRequestDto messageRequestDto,
+    Task<MessageResponse> SendMessage(
+        MessageRequest messageRequest,
         long conversationId,
         CancellationToken cancellationToken);
 
-    Task<MessageDto> EditMessage(
-        MessageRequestDto messageRequestDto,
+    Task<MessageResponse> EditMessage(
+        MessageRequest messageRequest,
         long messageId,
         long conversationId,
         CancellationToken cancellationToken);
 
-    Task<MessageDto> RemoveMessage(
+    Task<MessageResponse> RemoveMessage(
         long messageId,
         long conversationId,
         CancellationToken cancellationToken);
 
-    Task<MessagesDto> GetMessages(
+    Task<MessagesResponse> GetMessages(
         CancellationToken cancellationToken,
         long conversationId,
         long offsetMessageId = 1,

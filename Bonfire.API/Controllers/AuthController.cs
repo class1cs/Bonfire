@@ -11,20 +11,23 @@ public class AuthController : ControllerBase
 {
     private readonly IIdentityService _identityService;
 
-    public AuthController(IIdentityService identityService) => _identityService = identityService;
+    public AuthController(IIdentityService identityService)
+    {
+        _identityService = identityService;
+    }
 
     [HttpPost(Routes.Auth.Register)]
-    public async Task<IActionResult> Register(RegisterRequestDto registerRequestDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register(RegisterRequest registerRequest, CancellationToken cancellationToken)
     {
-        var responseDto = await _identityService.Register(registerRequestDto, cancellationToken);
+        var responseDto = await _identityService.Register(registerRequest, cancellationToken);
 
         return Ok(responseDto);
     }
 
     [HttpPost(Routes.Auth.Login)]
-    public async Task<IActionResult> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(LoginRequest loginRequest, CancellationToken cancellationToken)
     {
-        var responseDto = await _identityService.Login(loginRequestDto, cancellationToken);
+        var responseDto = await _identityService.Login(loginRequest, cancellationToken);
 
         return Ok(responseDto);
     }

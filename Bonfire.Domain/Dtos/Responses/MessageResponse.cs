@@ -1,7 +1,7 @@
 ﻿namespace Bonfire.Domain.Dtos.Responses;
 
-public record MessageDto(
+public record MessageResponse(
     long Id,
-    UserDto Author,
+    UserResponse Author,
     string Text,
     DateTimeOffset SentTime);

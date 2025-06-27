@@ -22,10 +22,10 @@ public class ChatController : ControllerBase
     [HttpPost(Routes.Chat.SendMessage)]
     public async Task<IActionResult> SendMessage(
         long conversationId,
-        [FromBody] MessageRequestDto messageRequestDto,
+        [FromBody] MessageRequest messageRequest,
         CancellationToken cancellationToken)
     {
-        var responseDto = await _messagesService.SendMessage(messageRequestDto, conversationId, cancellationToken);
+        var responseDto = await _messagesService.SendMessage(messageRequest, conversationId, cancellationToken);
 
         return Ok(responseDto);
     }
@@ -46,10 +46,10 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> EditMessage(
         long messageId,
         long conversationId,
-        [FromBody] MessageRequestDto messageRequestDto,
+        [FromBody] MessageRequest messageRequest,
         CancellationToken cancellationToken)
     {
-        var responseDto = await _messagesService.EditMessage(messageRequestDto, messageId, conversationId, cancellationToken);
+        var responseDto = await _messagesService.EditMessage(messageRequest, messageId, conversationId, cancellationToken);
 
         return Ok(responseDto);
     }
@@ -67,10 +67,10 @@ public class ChatController : ControllerBase
 
     [HttpPost(Routes.Chat.CreateConversation)]
     public async Task<IActionResult> CreateConversation(
-        [FromBody] ConversationRequestDto conversationRequestDto,
+        [FromBody] ConversationRequest conversationRequest,
         CancellationToken cancellationToken)
     {
-        var responseDto = await _conversationsService.CreateConversation(conversationRequestDto, cancellationToken);
+        var responseDto = await _conversationsService.CreateConversation(conversationRequest, cancellationToken);
 
         return Ok(responseDto);
     }

@@ -5,5 +5,5 @@ namespace Bonfire.Application.Interfaces;
 
 public interface ITokenService
 {
-    public TokenDto GenerateToken(User user);
+    public TokenResponse GenerateToken(User user);
 }

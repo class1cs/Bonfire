@@ -9,5 +9,21 @@
       <jdbc-url>jdbc:postgresql://localhost/bonfire?password=admin&amp;user=postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="bonfire@localhost [2]" uuid="f798f6a1-7ad7-47dd-b3ad-84b0124d771f">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost/bonfire?logServerErrorDetail=true&amp;password=admin&amp;user=postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="bonfire@localhost [3]" uuid="4f62dda9-9628-48f0-982a-a96a01c3f02c">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost/bonfire?logServerErrorDetail=true&amp;password=admin&amp;user=postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

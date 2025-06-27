@@ -10,17 +10,17 @@ namespace Bonfire.Application.Services;
 
 public class ConversationsService(AppDbContext dbContext, IUserService userService) : IConversationsService
 {
-    public async Task<ConversationDto> CreateConversation(
-        ConversationRequestDto conversationRequestDto,
+    public async Task<ConversationResponse> CreateConversation(
+        ConversationRequest conversationRequest,
         CancellationToken cancellationToken)
     {
         var currentUser = await userService.GetCurrentUser(cancellationToken);
 
         var receivers = await dbContext.Users
-            .Where(u => conversationRequestDto.UsersIds.Contains(u.Id))
+            .Where(u => conversationRequest.UsersIds.Contains(u.Id))
             .ToListAsync(cancellationToken);
 
-        if (receivers.Count != conversationRequestDto.UsersIds.Count)
+        if (receivers.Count != conversationRequest.UsersIds.Count)
         {
             throw new WrongConversationParticipantsIdsException();
         }
@@ -34,9 +34,7 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
 
         var participants = new List<User>(receivers);
 
-        var conversationType = receivers.Count > 2
-            ? ConversationType.Conversation
-            : ConversationType.Dialogue;
+        var conversationType = receivers.Count > 2 ? ConversationType.Conversation : ConversationType.Dialogue;
 
         var existingChat = await dbContext.Conversations
             .Include(x => x.Participants)
@@ -45,9 +43,10 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
 
         if (existingChat is not null)
         {
-            return new(existingChat.Id,
-                existingChat.Participants.Select(x => new UserDto(x.Id, x.Nickname))
-                    .ToArray(), existingChat.Type);
+            return new ConversationResponse(
+                existingChat.Id,
+                existingChat.Participants.Select(x => new UserResponse(x.Id, x.Nickname)).ToArray(), 
+                existingChat.Type);
         }
 
         var conversation = new Conversation(new List<Message>(), participants, conversationType);
@@ -56,11 +55,11 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new(conversation.Id,
-            conversation.Participants.Select(x => new UserDto(x.Id, x.Nickname))
+            conversation.Participants.Select(x => new UserResponse(x.Id, x.Nickname))
                 .ToArray(), conversation.Type);
     }
 
-    public async Task<ConversationDto[]> GetConversations(
+    public async Task<ConversationResponse[]> GetConversations(
         CancellationToken cancellationToken,
         long offsetMessageId = 0,
         short limit = 50)
@@ -76,12 +75,7 @@ public class ConversationsService(AppDbContext dbContext, IUserService userServi
             .Take(limit)
             .ToArrayAsync(cancellationToken);
 
-        var conversationResponses = conversations.Select(x => new ConversationDto(x.Id,
-                x.Participants.Select(user => new UserDto(user.Id,
-                        user.Nickname))
-                    .ToArray(),
-                x.Type))
-            .ToArray();
+        var conversationResponses = conversations.Select(x => new ConversationResponse(x.Id, x.Participants.Select(user => new UserResponse(user.Id, user.Nickname)).ToArray(), x.Type)).ToArray();
 
         return conversationResponses;
     }

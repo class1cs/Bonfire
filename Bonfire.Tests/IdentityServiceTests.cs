@@ -107,8 +107,7 @@ public class IdentityServiceTests
         // Act
         var result = async () =>
         {
-            await loginService.Login(new(string.Empty,
-                string.Empty), default);
+            await loginService.Login(new("wrongnick", "wrongpass"), default);
         };
 
         // Assert
@@ -138,7 +137,7 @@ public class IdentityServiceTests
             .Options;
 
         var user = CreateUser();
-        var request = new RegisterRequestDto(user.Nickname, "test");
+        var request = new RegisterRequest(user.Nickname, "test");
         var passwordHasherService = A.Fake<IPasswordHasherService>();
 
         A.CallTo(() => passwordHasherService.HashPassword("test"))
@@ -177,7 +176,7 @@ public class IdentityServiceTests
             .Options;
 
         var user = CreateUser();
-        var request = new RegisterRequestDto(user.Nickname, "test");
+        var request = new RegisterRequest(user.Nickname, "test");
 
         var tokenService = A.Fake<ITokenService>();
         var timeProvider = A.Fake<TimeProvider>();
@@ -213,7 +212,7 @@ public class IdentityServiceTests
                 .ToString())
             .Options;
 
-        var request = new RegisterRequestDto(string.Empty, string.Empty);
+        var request = new RegisterRequest(string.Empty, string.Empty);
 
         var timeProvider = A.Fake<TimeProvider>();
         var tokenService = A.Fake<ITokenService>();

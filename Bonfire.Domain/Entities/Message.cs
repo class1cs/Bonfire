@@ -20,7 +20,7 @@ public class Message
 
     public string Text { get; set; }
 
-    public DateTimeOffset SentTime { get; }
+    public DateTimeOffset SentTime { get; set; }
 
     public User Author { get; set; }
 

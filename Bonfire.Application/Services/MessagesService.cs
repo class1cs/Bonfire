@@ -1,9 +1,11 @@
-﻿using Bonfire.Application.Interfaces;
+﻿using Bonfire.Application.Hubs;
+using Bonfire.Application.Interfaces;
 using Bonfire.Domain.Dtos.Requests;
 using Bonfire.Domain.Dtos.Responses;
 using Bonfire.Domain.Entities;
 using Bonfire.Domain.Exceptions;
 using Bonfire.Persistance;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bonfire.Application.Services;
@@ -11,10 +13,11 @@ namespace Bonfire.Application.Services;
 public class MessagesService(
     AppDbContext dbContext,
     IUserService userService,
-    TimeProvider timeProvider) : IMessagesService
+    TimeProvider timeProvider,
+    IHubContext<BonfireHub, IBonfireHubClient> hubContext) : IMessagesService
 {
-    public async Task<MessageDto> SendMessage(
-        MessageRequestDto messageRequestDto,
+    public async Task<MessageResponse> SendMessage(
+        MessageRequest messageRequest,
         long conversationId,
         CancellationToken cancellationToken)
     {
@@ -34,24 +37,19 @@ public class MessagesService(
             throw new AccessToConversationDeniedException();
         }
 
-        if (string.IsNullOrWhiteSpace(messageRequestDto.Text))
-        {
-            throw new EmptyMessageTextException();
-        }
-
-        var message = new Message(messageRequestDto.Text, currentUser, timeProvider.GetUtcNow());
+        var message = new Message(messageRequest.Text, currentUser, timeProvider.GetUtcNow());
         conversation.Messages.Add(message);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new(message.Id,
-            new(message.Author.Id,
-                message.Author.Nickname),
-            message.Text,
+        var messageResponse = new MessageResponse(message.Id, new UserResponse(message.Author.Id, message.Author.Nickname), message.Text,
             message.SentTime);
+        await hubContext.Clients.Group($"conv_{conversation.Id}")
+            .ReceiveMessage(messageResponse);
+        return messageResponse;
     }
 
-    public async Task<MessageDto> EditMessage(
-        MessageRequestDto messageRequestDto,
+    public async Task<MessageResponse> EditMessage(
+        MessageRequest messageRequest,
         long messageId,
         long conversationId,
         CancellationToken cancellationToken)
@@ -78,12 +76,7 @@ public class MessagesService(
             throw new AccessToMessageDeniedException();
         }
 
-        if (string.IsNullOrWhiteSpace(messageRequestDto.Text))
-        {
-            throw new EmptyMessageTextException();
-        }
-
-        message.Text = messageRequestDto.Text;
+        message.Text = messageRequest.Text;
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new(message.Id,
@@ -93,7 +86,7 @@ public class MessagesService(
             message.SentTime);
     }
 
-    public async Task<MessageDto> RemoveMessage(
+    public async Task<MessageResponse> RemoveMessage(
         long messageId,
         long conversationId,
         CancellationToken cancellationToken)
@@ -124,41 +117,37 @@ public class MessagesService(
             message.SentTime);
     }
 
-    public async Task<MessagesDto> GetMessages(
+    public async Task<MessagesResponse> GetMessages(
         CancellationToken cancellationToken,
         long conversationId,
         long offsetMessageId = 0,
         short limit = 50)
     {
         var currentUser = await userService.GetCurrentUser(cancellationToken);
-
+        
         var conversation = await dbContext.Conversations
-            .Include(x => x.Messages.Where(b => b.Id > offsetMessageId)
-                .Take(limit))
-            .ThenInclude(message => message.Author)
+            .AsNoTracking()
             .Include(x => x.Participants)
-            .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Id == conversationId, cancellationToken);
-
-        var messagesResponses = conversation?.Messages
-            .Select(x =>
-                new MessageDto(x.Id,
-                    new(x.Author.Id, x.Author.Nickname),
-                    x.Text,
-                    x.SentTime))
-            .ToArray();
 
         if (conversation == null)
         {
             throw new ConversationNotFoundException();
         }
-
+        
         if (conversation.Participants.All(x => x.Id != currentUser.Id))
         {
             throw new AccessToConversationDeniedException();
         }
+        
+        var messagesResponses = await dbContext.Messages
+            .AsNoTracking()
+            .Where(b => b.ConversationId == conversationId && b.Id > offsetMessageId)
+            .OrderBy(b => b.Id)
+            .Take(limit)
+            .Select(x => new MessageResponse(x.Id, new UserResponse(x.Author.Id, x.Author.Nickname), x.Text, x.SentTime))
+            .ToArrayAsync(cancellationToken);
 
-        return new(conversation.Id,
-            messagesResponses!);
+        return new MessagesResponse(conversation.Id, messagesResponses);
     }
 }

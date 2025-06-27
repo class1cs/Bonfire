@@ -11,9 +11,9 @@ namespace Bonfire.Application.Services;
 
 public class IdentityService(ITokenService tokenService, AppDbContext appDbContext) : IIdentityService
 {
-    public async Task<TokenDto> Login(LoginRequestDto loginRequestDto, CancellationToken cancellationToken)
+    public async Task<TokenResponse> Login(LoginRequest loginRequest, CancellationToken cancellationToken)
     {
-        var authorizedUser = await VerifyLoginCredentials(loginRequestDto.NickName, loginRequestDto.Password, cancellationToken);
+        var authorizedUser = await VerifyLoginCredentials(loginRequest.NickName, loginRequest.Password, cancellationToken);
 
         if (authorizedUser is null)
         {
@@ -25,7 +25,7 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         return tokenDto;
     }
 
-    public async Task<TokenDto> Register(RegisterRequestDto registerUser, CancellationToken cancellationToken)
+    public async Task<TokenResponse> Register(RegisterRequest registerUser, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(registerUser.NickName) || string.IsNullOrWhiteSpace(registerUser.Password))
         {
@@ -38,7 +38,7 @@ public class IdentityService(ITokenService tokenService, AppDbContext appDbConte
         }
 
         var passwordHash = PasswordHasher.HashPassword(registerUser.Password);
-        var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>());
+        var userToAdd = new User(registerUser.NickName, passwordHash, new List<Conversation>(), new List<User>(), new List<FriendRequest>());
 
         await appDbContext.Users.AddAsync(userToAdd, cancellationToken);
         await appDbContext.SaveChangesAsync(cancellationToken);

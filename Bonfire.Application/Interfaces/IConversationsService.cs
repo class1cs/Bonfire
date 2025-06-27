@@ -5,9 +5,9 @@ namespace Bonfire.Application.Interfaces;
 
 public interface IConversationsService
 {
-    Task<ConversationDto> CreateConversation(ConversationRequestDto conversationRequestDto, CancellationToken cancellationToken);
+    Task<ConversationResponse> CreateConversation(ConversationRequest conversationRequest, CancellationToken cancellationToken);
 
-    Task<ConversationDto[]> GetConversations(
+    Task<ConversationResponse[]> GetConversations(
         CancellationToken cancellationToken,
         long offsetMessageId = 0,
         short limit = 50);

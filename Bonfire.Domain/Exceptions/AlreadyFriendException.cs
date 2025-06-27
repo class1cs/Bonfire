@@ -2,12 +2,12 @@
 
 namespace Bonfire.Domain.Exceptions;
 
-public class ReceiverEqualsSenderException : BaseException
+public class AlreadyFriendException : BaseException
 {
     /// <summary>
     /// Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
-    public ReceiverEqualsSenderException() : base(HttpStatusCode.Conflict, HttpErrors.ReceiverEqualsSender)
+    public AlreadyFriendException() : base(HttpStatusCode.Conflict, HttpErrors.AlreadyFriend)
     {
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bonfire.Domain.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,20 +12,32 @@ public class ExceptionMiddleware : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        if (exception is not BaseException baseException)
-        {
-            return false;
+        switch (exception)
+            {
+            // Обработка ваших кастомных исключений
+            case BaseException baseException:
+                var baseProblemDetails = new ProblemDetails
+                {
+                    Status = (int)baseException.ErrorCode,
+                    Title = baseException.Message
+                };
+                httpContext.Response.StatusCode = baseProblemDetails.Status.Value;
+                await httpContext.Response.WriteAsJsonAsync(baseProblemDetails, cancellationToken);
+                return true;
+
+            // Обработка ошибок валидации FluentValidation
+            case ValidationException validationException:
+                var validationProblemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = validationException.Errors.FirstOrDefault().ErrorMessage,
+                };
+                httpContext.Response.StatusCode = validationProblemDetails.Status.Value;
+                await httpContext.Response.WriteAsJsonAsync(validationProblemDetails, cancellationToken);
+                return true;
+
+            default:
+                return false;
         }
-
-        var problemDetails = new ProblemDetails
-        {
-            Status = (int) baseException.ErrorCode,
-            Title = baseException.Message
-        };
-
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-
-        return true;
     }
 }

@@ -8,7 +8,7 @@ public class ConversationAlreadyExistsException : BaseException
     /// Конструктор исключения, в котором указывается код и текст ошибки.
     /// </summary>
     public ConversationAlreadyExistsException() : base(HttpStatusCode.Conflict,
-        HttpErrors.ConversationAlreadyExistsException)
+        HttpErrors.ConversationAlreadyExists)
     {
     }
 }

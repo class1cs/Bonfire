@@ -27,7 +27,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Login_Should_Return_200_If_Successful()
     {
         // Arrange
-        var credentials = new RegisterRequestDto("testUser", "testPassword");
+        var credentials = new RegisterRequest("testUser", "testPassword");
         await _client.PostAsJsonAsync("api/auth/register", credentials);
 
         // Act
@@ -42,7 +42,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Login_Should_Return_Error_If_Account_Does_Not_Exists()
     {
         // Arrange
-        var credentials = new LoginRequestDto("testUser", "testPassword");
+        var credentials = new LoginRequest("testUser", "testPassword");
 
         // Act
         var loginRequest = await _client.PostAsJsonAsync("api/auth/login", credentials);
@@ -56,8 +56,8 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Login_Should_Return_Error_If_Credentials_Are_Incorrect()
     {
         // Arrange
-        var rightCredentials = new LoginRequestDto("testUser", "testPassword");
-        var wrongCredentials = new RegisterRequestDto("testUser", "wrongPassword");
+        var rightCredentials = new LoginRequest("testUser", "testPassword");
+        var wrongCredentials = new RegisterRequest("testUser", "wrongPassword");
         await _client.PostAsJsonAsync("api/auth/register", rightCredentials);
 
         // Act
@@ -72,7 +72,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Register_Should_Return_Token_If_Account_Does_Not_Exists()
     {
         // Arrange
-        var registerData = new RegisterRequestDto("testUser", "testPassword");
+        var registerData = new RegisterRequest("testUser", "testPassword");
 
         // Act
         var registerRequest = await _client.PostAsJsonAsync("api/auth/register", registerData);
@@ -86,7 +86,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Register_Should_Return_Error_If_Account_Already_Exists()
     {
         // Arrange
-        var registerData = new RegisterRequestDto("testUser", "testPassword");
+        var registerData = new RegisterRequest("testUser", "testPassword");
         await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         // Act
@@ -101,7 +101,7 @@ public class AuthControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Register_Should_Return_Error_If_Data_Is_Empty()
     {
         // Arrange
-        var registerData = new RegisterRequestDto(string.Empty, string.Empty);
+        var registerData = new RegisterRequest(string.Empty, string.Empty);
 
         // Act
         var registerRequest = await _client.PostAsJsonAsync("api/auth/register", registerData);

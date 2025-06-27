@@ -10,7 +10,10 @@ public class UsersController : ControllerBase
 {
     private readonly IUserInfoService _userInfoService;
 
-    public UsersController(IUserInfoService userInfoService) => _userInfoService = userInfoService;
+    public UsersController(IUserInfoService userInfoService)
+    { 
+        _userInfoService = userInfoService;
+    } 
 
     [HttpGet(Routes.Users.SearchUsers)]
     public async Task<IActionResult> SearchUsers(string searchRequest, CancellationToken cancellationToken)

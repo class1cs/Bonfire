@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Net;
 using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -51,7 +53,7 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Conversation_Should_Be_Returned_As_List()
     {
         // Arrange
-        var registerData = new RegisterRequestDto("firstUser", "123");
+        var registerData = new RegisterRequest("firstUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", registerData);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
@@ -67,12 +69,12 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async Task Conversation_Should_Not_Be_Created_If_Receiver_Equals_Sender()
     {
         // Arrange
-        var registerData = new RegisterRequestDto("firstUser", "123");
+        var registerData = new RegisterRequest("firstUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
 
-        var conversationCreateRequest = new ConversationRequestDto([1]);
+        var conversationCreateRequest = new ConversationRequest([1]);
 
         // Act
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
@@ -86,12 +88,12 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Conversation_Should_Not_Be_Created_If_Users_Ids_Is_Wrong()
     {
         // Arrange
-        var registerData = new RegisterRequestDto("firstUser", "123");
+        var registerData = new RegisterRequest("firstUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", registerData);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
 
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
 
         // Act
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
@@ -105,14 +107,14 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Conversation_Should_Be_Returned_If_It_Already_Exists()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
 
         // Act
@@ -127,19 +129,19 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Conversation_Should_Be_Created_As_Dialogue_If_Two_Users_In_It()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
 
         // Act
         var conversationRequest = await _client.PostAsJsonAsync("/api/chat/conversations", conversationCreateRequest);
         var json = await conversationRequest.Content.ReadAsStringAsync();
         
-        var response = JsonSerializer.Deserialize<ConversationDto>(json, new JsonSerializerOptions
+        var response = JsonSerializer.Deserialize<ConversationResponse>(json, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
@@ -156,22 +158,22 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Conversation_Should_Be_Created_As_Group_Conversation_If_Three_Or_More_Users_In_It()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2, 3]);
+        var conversationCreateRequest = new ConversationRequest([2, 3]);
 
         // Act
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         var json = await conversationRequest.Content.ReadAsStringAsync();
         
-        var response = JsonSerializer.Deserialize<ConversationDto>(json, new JsonSerializerOptions
+        var response = JsonSerializer.Deserialize<ConversationResponse>(json, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
@@ -188,58 +190,68 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Be_Sent_And_Return_Dto()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
          
         // Act
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test"));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test"));
         
         // Assert
         sendMessageRequest.StatusCode.Should()
             .Be(HttpStatusCode.OK);
     }
     
-    [Fact(DisplayName = "Пользователь отправляет запрос на получение сообщений и получает их DTO [200].")]
-    public async void Messages_Should_Be_Given()
+    [Fact(DisplayName = "Пользователь отправляет запрос на получение 50 сообщений и получает их в порядке отправки [200].")]
+    public async Task GetMessages_ShouldReturn50MessagesInOrder_WhenRequested()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+    
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
-        
+    
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
-        
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+    
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test"));
-        sendMessageRequest.EnsureSuccessStatusCode();
-        
+
+        // Отправка 50 сообщений
+        for (int i = 0; i < 50; i++)
+        {
+            var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest($"test message {i + 1}"));
+            sendMessageRequest.EnsureSuccessStatusCode();
+        }
+    
         // Act
         var getMessagesRequest = await _client.GetAsync($"api/chat/conversations/1/messages");
+    
         // Assert
-        getMessagesRequest.StatusCode.Should()
-            .Be(HttpStatusCode.OK);
+        getMessagesRequest.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var messagesResponse = await getMessagesRequest.Content.ReadFromJsonAsync<MessagesResponse>();
+    
+        messagesResponse.Messages.Should().HaveCount(50);
     }
+
     
     [Fact(DisplayName = "Пользователь отправляет запрос на получение чужих сообщений и получает ошибку [403].")]
     public async void Messages_Should_Not_Be_Given_If_Conversation_Does_Not_Belong_To_User()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -247,7 +259,7 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
@@ -265,20 +277,20 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Sent_If_Text_Is_Empty()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
          
         // Act
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto(string.Empty));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest(string.Empty));
         
         // Assert
         sendMessageRequest.StatusCode.Should()
@@ -289,21 +301,21 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Edited_If_Text_Is_Empty()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
-        
+                                                                    
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test"));
          
         // Act
-        var editMessageRequest =  await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequestDto(String.Empty));
+        var editMessageRequest =  await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequest(String.Empty));
         
         // Assert
         editMessageRequest.StatusCode.Should()
@@ -314,20 +326,20 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Edited_If_Message_Does_Not_Exist()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
         // Act
-        var editMessageRequest =  await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequestDto(String.Empty));
+        var editMessageRequest =  await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequest("test"));
         
         // Assert
         editMessageRequest.StatusCode.Should()
@@ -338,9 +350,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Edited_If_Message_Does_Not_Belong_To_Him()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -348,16 +360,16 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test1"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test1"));
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
         // Act
-        var editMessageRequest = await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequestDto("test"));
+        var editMessageRequest = await _client.PutAsJsonAsync($"api/chat/conversations/1/messages/1", new MessageRequest("test"));
         
         // Assert
         editMessageRequest.StatusCode.Should()
@@ -368,9 +380,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Edited_If_Message_Belong_To_Wrong_Conversation()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -378,16 +390,16 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test1"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test1"));
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
         // Act
-        var editMessageRequest = await _client.PutAsJsonAsync($"api/chat/conversations/2/messages/1", new MessageRequestDto("test"));
+        var editMessageRequest = await _client.PutAsJsonAsync($"api/chat/conversations/2/messages/1", new MessageRequest("test"));
         
         // Assert
         editMessageRequest.StatusCode.Should()
@@ -398,20 +410,20 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Sent_If_Text_Is_WhiteSpaced()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
          
         // Act
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("        "));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("        "));
         // Assert
         sendMessageRequest.StatusCode.Should()
             .Be(HttpStatusCode.BadRequest);
@@ -421,18 +433,18 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Messages_Should_Not_Be_Given_If_Conversation_Does_Not_Exist()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test"));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test"));
         sendMessageRequest.EnsureSuccessStatusCode();
         
         // Act
@@ -447,22 +459,20 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Messages_Should_Not_Be_Sent_If_Conversation_Does_Not_Exist()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
         
         await _client.PostAsJsonAsync("api/auth/register", firstUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
-        var conversationCreateRequest = new ConversationRequestDto([2]);
+        var conversationCreateRequest = new ConversationRequest([2]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        
-        
         // Act
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/2/messages", new MessageRequestDto("Test"));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/2/messages", new MessageRequest("Test"));
         
         // Assert
         sendMessageRequest.StatusCode.Should()
@@ -473,9 +483,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Messages_Should_Not_Be_Sent_If_It_Sent_In_Conversation_Where_User_Is_Not_In()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -483,14 +493,14 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
         // Act
-        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("Test"));
+        var sendMessageRequest = await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("Test"));
         
         // Assert
         sendMessageRequest.StatusCode.Should()
@@ -501,9 +511,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Deleted_If_Message_Does_Not_Belong_To_Him()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -511,11 +521,11 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test1"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test1"));
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         
@@ -531,9 +541,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Deleted_If_Message_Does_Not_Exist()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -541,7 +551,7 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
@@ -557,9 +567,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Be_Deleted()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -567,11 +577,11 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test1"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test1"));
         
         // Act
         var deleteMessageRequest = await _client.DeleteAsync($"api/chat/conversations/1/messages/1");
@@ -585,9 +595,9 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
     public async void Message_Should_Not_Be_Deleted_If_Message_Belong_To_Wrong_Conversation()
     {
         // Arrange
-        var firstUserRegisterData = new RegisterRequestDto("firstUser", "123");
-        var secondUserRegisterData = new RegisterRequestDto("secondUser", "123");
-        var thirdUserRegisterData = new RegisterRequestDto("thirdUser", "123");
+        var firstUserRegisterData = new RegisterRequest("firstUser", "123");
+        var secondUserRegisterData = new RegisterRequest("secondUser", "123");
+        var thirdUserRegisterData = new RegisterRequest("thirdUser", "123");
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("2");
         
@@ -595,11 +605,11 @@ public class ChatControllerTests : IClassFixture<ApiWebApplicationFactory>, IAsy
         await _client.PostAsJsonAsync("api/auth/register", secondUserRegisterData);
         await _client.PostAsJsonAsync("api/auth/register", thirdUserRegisterData);
         
-        var conversationCreateRequest = new ConversationRequestDto([3]);
+        var conversationCreateRequest = new ConversationRequest([3]);
         var conversationRequest = await _client.PostAsJsonAsync("api/chat/conversations", conversationCreateRequest);
         conversationRequest.EnsureSuccessStatusCode();
         
-        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequestDto("test1"));
+        await _client.PostAsJsonAsync($"api/chat/conversations/1/messages", new MessageRequest("test1"));
         
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("1");
         

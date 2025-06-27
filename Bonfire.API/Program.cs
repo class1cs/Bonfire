@@ -1,5 +1,6 @@
 using System.Text;
 using Bonfire.API.Middlewares;
+using Bonfire.Application.Hubs;
 using Bonfire.Application.Interfaces;
 using Bonfire.Application.Services;
 using Bonfire.Persistance;
@@ -8,20 +9,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Конфигурация
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
-
 var issuer = builder.Configuration.GetValue<string>("AuthOptions:Issuer");
 var audience = builder.Configuration.GetValue<string>("AuthOptions:Audience");
 var key = builder.Configuration.GetValue<string>("AuthOptions:Key");
 var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:3000";
 
 var services = builder.Services;
 
+// Добавляем сервисы
 services.AddEndpointsApiExplorer();
 
+// Настройка Swagger
 services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new()
@@ -50,11 +57,25 @@ services.AddSwaggerGen(c =>
     });
 });
 
+// Настройка контроллеров и валидации
 services.AddProblemDetails()
     .AddHttpContextAccessor()
     .AddSerilog()
-    .AddControllers();
+    .AddControllers().ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = c =>
+        {
+            var errors =
+                c.ModelState
+                    .Where(x => x.Value?.Errors.Any() == true)
+                    .SelectMany(x => x.Value.Errors.Select(e => new ValidationFailure(x.Key, e.ErrorMessage)))
+                    .ToArray();
 
+            throw new ValidationException("invalid data in request", errors);
+        };
+    });
+
+// Регистрация сервисов
 services.AddExceptionHandler<ExceptionMiddleware>()
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<IIdentityService, IdentityService>()
@@ -68,12 +89,27 @@ services.AddExceptionHandler<ExceptionMiddleware>()
         options.UseNpgsql(connString);
     });
 
+services.AddValidatorsFromAssemblyContaining<Program>();
+services.AddFluentValidationAutoValidation();
+
+// Настройка логирования
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-services.AddAuthorization();
+// Настройка CORS
+services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins(frontendUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Важно для JWT и SignalR
+    });
+});
 
+// Настройка аутентификации
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -87,10 +123,31 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = symmetricSecurityKey,
             ValidateIssuerSigningKey = true
         };
+        
+        // Для SignalR
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/bonfireHub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
+
+services.AddAuthorization();
+services.AddSignalR();
 
 var app = builder.Build();
 
+// Настройка middleware pipeline (важен порядок!)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -98,14 +155,21 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.MapControllers();
+
+
+app.UseCors("CorsPolicy");
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseExceptionHandler();
 
+app.MapControllers();
+app.MapHub<BonfireHub>("/bonfireHub");
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 app.Run();
 
-public partial class Program
-{
-}
+public partial class Program { }
