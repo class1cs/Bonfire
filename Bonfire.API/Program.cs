@@ -15,7 +15,6 @@ using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Конфигурация
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 var issuer = builder.Configuration.GetValue<string>("AuthOptions:Issuer");
 var audience = builder.Configuration.GetValue<string>("AuthOptions:Audience");
@@ -25,10 +24,8 @@ var frontendUrl = builder.Configuration.GetValue<string>("FrontendUrl") ?? "http
 
 var services = builder.Services;
 
-// Добавляем сервисы
 services.AddEndpointsApiExplorer();
 
-// Настройка Swagger
 services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new()
@@ -57,7 +54,6 @@ services.AddSwaggerGen(c =>
     });
 });
 
-// Настройка контроллеров и валидации
 services.AddProblemDetails()
     .AddHttpContextAccessor()
     .AddSerilog()
@@ -75,7 +71,6 @@ services.AddProblemDetails()
         };
     });
 
-// Регистрация сервисов
 services.AddExceptionHandler<ExceptionMiddleware>()
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<IIdentityService, IdentityService>()
@@ -92,12 +87,10 @@ services.AddExceptionHandler<ExceptionMiddleware>()
 services.AddValidatorsFromAssemblyContaining<Program>();
 services.AddFluentValidationAutoValidation();
 
-// Настройка логирования
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-// Настройка CORS
 services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -105,11 +98,10 @@ services.AddCors(options =>
         policy.WithOrigins(frontendUrl)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // Важно для JWT и SignalR
+              .AllowCredentials(); 
     });
 });
 
-// Настройка аутентификации
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -124,7 +116,6 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true
         };
         
-        // Для SignalR
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -147,7 +138,6 @@ services.AddSignalR();
 
 var app = builder.Build();
 
-// Настройка middleware pipeline (важен порядок!)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
